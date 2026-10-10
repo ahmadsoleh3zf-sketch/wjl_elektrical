@@ -1,0 +1,2425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WJL Electrical System - Dept. WJL (Water Jet Loom)</title>
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --primary: #38bdf8;
+            --primary-hover: #0284c7;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #a855f7;
+            --overshift: #fb923c;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* LAYAR LOGIN STYLING */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-main);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .login-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        .login-card h2 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 1.25rem;
+        }
+        .login-card p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .navbar { height: 55px; background-color: #0b1329; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0; overflow-x: auto; }
+        .brand { font-size: 1.05rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+        .brand span.sub-title { color: var(--text-muted); font-weight: 400; font-size: 0.8rem; margin-left: 4px; border-left: 1px solid var(--border-color); padding-left: 8px; }
+        .nav-menu { list-style: none; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+        .nav-item button { background: none; border: none; color: var(--text-muted); padding: 6px 14px; border-radius: 6px; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+        .nav-item button:hover { background-color: var(--bg-hover); color: var(--text-main); }
+        .nav-item button.active { background-color: var(--primary); color: #000; font-weight: 600; }
+        .btn-logout { background-color: rgba(239, 68, 68, 0.2) !important; color: var(--danger) !important; border: 1px solid rgba(239, 68, 68, 0.4) !important; }
+        .btn-logout:hover { background-color: var(--danger) !important; color: #fff !important; }
+
+        .content { flex: 1; padding: 15px 20px; max-width: 1400px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; overflow: hidden; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0; }
+        .title { font-size: 1.3rem; font-weight: 700; }
+        .year-selector { display: flex; align-items: center; gap: 8px; background-color: var(--bg-card); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.85rem; }
+
+        select, input, textarea { background-color: #0f172a; color: var(--text-main); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 6px; font-size: 0.82rem; outline: none; width: 100%; }
+        select:focus, input:focus, textarea:focus { border-color: var(--primary); }
+
+        .btn { background-color: var(--primary); color: #0f172a; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background-color 0.2s; font-size: 0.82rem; }
+        .btn:hover { background-color: var(--primary-hover); color: #fff; }
+        .btn-success { background-color: var(--success); color: #fff; }
+        .btn-warning { background-color: var(--warning); color: #000; }
+        .btn-danger { background-color: var(--danger); color: #fff; }
+        .btn-secondary { background-color: var(--bg-hover); color: var(--text-main); }
+        .btn-disabled { opacity: 0.4; cursor: not-allowed !important; pointer-events: none; }
+
+        .tab-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        #tab-settings, #tab-sop {
+            overflow-y: auto !important;
+            padding-bottom: 25px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 15px;
+            width: 100%;
+        }
+
+        /* SOP Tabs Layout */
+        .sop-container { display: flex; flex-direction: column; gap: 12px; height: 100%; overflow: hidden; }
+        .sop-tabs { display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; align-items: center; justify-content: space-between; }
+        .sop-tab-btn { background-color: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
+        .sop-tab-btn:hover { background-color: var(--bg-hover); color: var(--text-main); }
+        .sop-tab-btn.active { background-color: var(--purple); color: #fff; border-color: var(--purple); font-weight: 600; }
+        
+        .sop-content-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; flex: 1; overflow-y: auto; font-size: 0.9rem; line-height: 1.7; white-space: pre-wrap; color: var(--text-main); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px; flex-shrink: 0; }
+        .stat-card { background-color: var(--bg-card); border-radius: 8px; padding: 14px 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; }
+        .stat-card .label { color: var(--text-muted); font-size: 0.78rem; margin-bottom: 4px; }
+        .stat-card .value { font-size: 1.4rem; font-weight: 700; }
+
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; flex: 1; min-height: 0; }
+        .chart-card { background-color: var(--bg-card); border-radius: 8px; padding: 12px 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .chart-card h3 { font-size: 0.9rem; margin-bottom: 8px; color: var(--text-main); }
+        .canvas-container { width: 100%; height: 180px; position: relative; flex: 1; }
+
+        .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
+        .filter-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+        .table-container { background-color: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); flex: 1; overflow-y: auto; max-height: calc(100vh - 220px); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.83rem; }
+        th { background-color: #1a233a; padding: 8px 12px; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border-color); white-space: nowrap; position: sticky; top: 0; z-index: 10; }
+        td { padding: 8px 12px; border-bottom: 1px solid var(--border-color); white-space: nowrap; vertical-align: middle; }
+        tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+        .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+        .badge-danger { background-color: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .badge-warning { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .badge-success { background-color: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge-overshift { background-color: rgba(251, 146, 60, 0.2); color: var(--overshift); border: 1px solid rgba(251, 146, 60, 0.4); }
+
+        .print-view-hidden { display: none !important; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); z-index: 1000; justify-content: center; align-items: center; padding: 10px; }
+        .modal.active { display: flex; }
+        .modal-content { background-color: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); width: 100%; max-width: 760px; padding: 16px 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6); overflow: hidden; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .modal-header h3 { font-size: 1rem; color: var(--primary); }
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; line-height: 1; }
+
+        .form-group { margin-bottom: 8px; display: flex; flex-direction: column; gap: 3px; }
+        .form-group label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+
+        .history-box { background: #0f172a; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.75rem; max-height: 100px; overflow-y: auto; margin-top: 4px; display: none; }
+
+        .print-header { display: none; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        .print-header h2 { font-size: 1.2rem; color: #000; text-transform: uppercase; }
+        .print-header p { font-size: 0.8rem; color: #333; }
+
+        @media print {
+            @page { size: A4 portrait; margin: 10mm; }
+            body { background-color: #fff !important; color: #000 !important; overflow: visible !important; height: auto !important; }
+            #login-screen { display: none !important; }
+            .navbar, .action-bar, .modal, .year-selector, .btn, .sop-tabs, div[id^="pagination-"] { display: none !important; }
+            
+            #container-bd-harian th:last-child,
+            #container-bd-harian td:last-child {
+                display: none !important;
+            }
+
+            .print-header { display: block !important; }
+            .content { padding: 0 !important; max-width: 100% !important; }
+            .sop-content-card { border: none !important; color: #000 !important; font-size: 0.95rem !important; line-height: 1.8 !important; padding: 0 !important; }
+            .table-container { max-height: none !important; border: 1px solid #000 !important; overflow: visible !important; background-color: #fff !important; }
+            table { width: 100% !important; border-collapse: collapse !important; font-size: 0.65rem !important; }
+            th { background-color: #f1f5f9 !important; color: #000 !important; border: 1px solid #000 !important; position: static !important; padding: 4px 3px !important; }
+            td { color: #000 !important; border: 1px solid #000 !important; padding: 4px 3px !important; white-space: normal !important; text-align: center; }
+            .badge { border: 1px solid #000; color: #000 !important; background: none !important; padding: 1px 4px; }
+            .print-view-hidden { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LAYAR LOGIN (LOCK SCREEN) -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h2>⚡ WJL ELECTRICAL SYSTEM</h2>
+            <p>Divisi Elektrik Dept. WJL (Water Jet Loom)<br>Silakan masukkan kata sandi akses.</p>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group" style="text-align: left; margin-bottom: 15px;">
+                    <label>Password Akses</label>
+                    <input type="password" id="login-password" placeholder="Masukkan password..." required autofocus>
+                </div>
+                <button type="submit" class="btn" style="width: 100%; padding: 10px;">Masuk Sistem</button>
+            </form>
+            <div id="login-error" style="color: var(--danger); font-size: 0.75rem; margin-top: 10px; display: none;">Password salah! Silakan coba lagi.</div>
+        </div>
+    </div>
+
+    <!-- MODAL VERIFIKASI MASUK MENU PENGATURAN -->
+    <div id="modal-settings-auth" class="modal">
+        <div class="modal-content" style="max-width: 320px;">
+            <div class="modal-header">
+                <h3>Verifikasi Password Pengaturan</h3>
+                <button class="close-btn" onclick="closeModal('modal-settings-auth')">&times;</button>
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom: 10px;">Masukkan password verifikasi untuk membuka menu pengaturan.</p>
+            <div class="form-group">
+                <input type="password" id="settings-auth-password" placeholder="Password pengaturan...">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modal-settings-auth')">Batal</button>
+                <button class="btn" onclick="verifySettingsAccess()">Masuk Pengaturan</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="print-header">
+        <h2>LAPORAN PEMELIHARAAN & MONITORING - DIVISI ELEKTRIK DEPT. WJL (WATER JET LOOM)</h2>
+        <p id="print-sub-header">Tahun Operasional: 2026</p>
+    </div>
+
+    <!-- Top Navbar -->
+    <div class="navbar">
+        <div class="brand">
+            ⚡ <span>WJL ELECTRICAL SYSTEM</span>
+            <span class="sub-title">Divisi Elektrik Dept. WJL (Water Jet Loom)</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><button class="active" onclick="switchTab('dashboard', this)">📊 Dasbor Utama</button></li>
+            <li class="nav-item"><button onclick="switchTab('breakdown', this)">🛠️ Laporan Breakdown</button></li>
+            <li class="nav-item"><button onclick="switchTab('agenda', this)">📅 Agenda & PM</button></li>
+            <li class="nav-item"><button onclick="switchTab('kwh', this)">⚡ Monitoring kWh</button></li>
+            <li class="nav-item"><button onclick="switchTab('sop', this)" style="color: var(--purple);">📖 Menu SOP</button></li>
+            <li class="nav-item"><button onclick="requestOpenSettings(this)">⚙ Pengaturan</button></li>
+            <li class="nav-item"><button class="btn-logout" onclick="logoutSystem()">🔒 Keluar</button></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="header">
+            <h1 class="title" id="page-title">Dasbor Utama</h1>
+            <div class="year-selector">
+                <label for="select-year">Tahun:</label>
+                <select id="select-year" onchange="changeYear(this.value)"></select>
+                <button class="btn btn-secondary" onclick="openModal('modal-add-year')" style="padding: 2px 6px;">➕</button>
+            </div>
+        </div>
+
+        <!-- TAB: DASHBOARD -->
+        <div id="tab-dashboard" class="tab-pane">
+            <div class="action-bar" style="background-color: var(--bg-card); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <div class="filter-group">
+                    <label style="font-size: 0.85rem; color: var(--text-muted);">Mode Dasbor:</label>
+                    <select id="dashboard-mode" onchange="toggleDashboardMode()" style="width: 140px;">
+                        <option value="year">Rekap Per Tahun</option>
+                        <option value="month">Rekap Per Bulan</option>
+                    </select>
+                </div>
+                <div class="filter-group" id="dashboard-month-group" style="display: none;">
+                    <label style="font-size: 0.85rem; color: var(--text-muted);">Pilih Bulan:</label>
+                    <select id="dashboard-month-select" onchange="renderDashboard()" style="width: 130px;">
+                        <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                        <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                        <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                        <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- PERINGATAN / BACKUP REMINDER -->
+            <div style="background-color: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; color: var(--primary);">
+                <span>💡 <strong>Pengingat Keamanan Data:</strong> Selalu lakukan <u>Full Backup JSON</u> di menu Pengaturan secara berkala (minimal 1 bulan sekali) untuk mengamankan data sistem.</span>
+                <button class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.75rem;" onclick="switchTab('settings', document.querySelectorAll('.nav-menu button')[5])">⚙ Ke Pengaturan</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label" id="label-stat-bd">Total Kejadian Breakdown (Tahunan)</div>
+                    <div class="value" id="stat-total-bd" style="color: var(--danger);">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label" id="label-stat-dt">Total Down Time (Tahunan)</div>
+                    <div class="value" id="stat-total-dt" style="color: var(--warning);">0 Jam</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label" id="label-stat-kwh">Total Pemakaian kWh PLN (Tahunan)</div>
+                    <div class="value" id="stat-total-kwh" style="color: var(--success);">0 kWh</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label" id="label-stat-pm">Agenda PM Mendatang / Status</div>
+                    <div class="value" id="stat-pending-pm" style="color: var(--primary);">0</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 id="title-chart-downtime">Tren Down Time Per Bulan (Jam)</h3>
+                    <div class="canvas-container"><canvas id="chart-downtime"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Distribusi Kerusakan Berdasarkan Kategori</h3>
+                    <div class="canvas-container"><canvas id="chart-items"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>5 Sparepart Paling Sering Diganti / Rusak</h3>
+                    <div class="canvas-container"><canvas id="chart-spareparts"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: BREAKDOWN REPORT -->
+        <div id="tab-breakdown" class="tab-pane" style="display: none;">
+            <div class="action-bar" style="background-color: var(--bg-card); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 10px;">
+                <div class="filter-group">
+                    <label style="font-size: 0.85rem; color: var(--text-muted);">Tampilan Data:</label>
+                    <select id="breakdown-sub-mode" onchange="toggleBreakdownSubMode()" style="width: 200px;">
+                        <option value="harian">🛠️ Laporan Harian Breakdown</option>
+                        <option value="sparepart">🔩 Sparepart Diganti</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label style="font-size: 0.85rem; color: var(--text-muted);">Mode Tampilan:</label>
+                    <select id="breakdown-mode" onchange="toggleBreakdownMode()" style="width: 140px;">
+                        <option value="year">Rekap Per Tahun</option>
+                        <option value="month">Rekap Per Bulan</option>
+                    </select>
+                </div>
+                <div class="filter-group" id="breakdown-month-group" style="display: none;">
+                    <label style="font-size: 0.85rem; color: var(--text-muted);">Pilih Bulan:</label>
+                    <select id="breakdown-month-select" onchange="bdCurrentPage=1; renderBreakdownTable()" style="width: 130px;">
+                        <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                        <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                        <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                        <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="downloadExcelTemplate('breakdown')">📄 Templat Excel</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('import-excel-bd').click()">📥 Impor Excel</button>
+                    <input type="file" id="import-excel-bd" accept=".xlsx, .csv" style="display:none;" onchange="importExcel(event, 'breakdown')">
+                    <button class="btn btn-secondary" onclick="exportToExcel('breakdown')">📤 Ekspor Excel</button>
+                    <button class="btn btn-secondary" onclick="printReport('breakdown')">🖨 Cetak PDF</button>
+                    <button class="btn" onclick="openBreakdownModal()">➕ Lapor Breakdown</button>
+                </div>
+            </div>
+
+            <div class="action-bar" style="margin-bottom: 8px;">
+                <div class="filter-group">
+                    <input type="text" id="search-bd" placeholder="Cari mesin, kerusakan, sparepart, teknisi..." oninput="bdCurrentPage=1; renderBreakdownTable()">
+                    <input type="date" id="bd-filter-start" onchange="bdCurrentPage=1; renderBreakdownTable()">
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">s/d</span>
+                    <input type="date" id="bd-filter-end" onchange="bdCurrentPage=1; renderBreakdownTable()">
+                    <button class="btn btn-secondary" onclick="resetBdFilter()" style="padding: 4px 8px;">Reset Filter</button>
+                </div>
+            </div>
+
+            <!-- TABEL 1: LAPORAN HARIAN BREAKDOWN -->
+            <div class="table-container" id="container-bd-harian">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>No. Mesin</th>
+                            <th>Nama Mesin</th>
+                            <th>Kerusakan</th>
+                            <th>Start Jam</th>
+                            <th>Selesai Jam</th>
+                            <th>Total Jam</th>
+                            <th>Tindakan Perbaikan</th>
+                            <th>Teknisi / PIC</th>
+                            <th>Shift</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-bd-body"></tbody>
+                </table>
+            </div>
+
+            <!-- TABEL 2: SPAREPART DIGANTI -->
+            <div class="table-container print-view-hidden" id="container-bd-sparepart">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>No. Mesin</th>
+                            <th>Nama Mesin</th>
+                            <th>Sparepart Diganti</th>
+                            <th>Ukuran</th>
+                            <th>Jumlah</th>
+                            <th>Teknisi / PIC</th>
+                            <th>Shift</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-sparepart-body"></tbody>
+                </table>
+            </div>
+
+            <div id="pagination-bd"></div>
+        </div>
+
+        <!-- TAB: AGENDA & PM -->
+        <div id="tab-agenda" class="tab-pane" style="display: none;">
+            <div class="action-bar" style="background-color: var(--bg-card); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 12px;">
+                <div class="filter-group">
+                    <label style="font-size: 0.85rem; color: var(--text-muted);">Mode Agenda:</label>
+                    <select id="agenda-mode" onchange="toggleAgendaMode()" style="width: 150px;">
+                        <option value="harian">Agenda Harian</option>
+                        <option value="bulanan">Agenda Bulanan</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label style="font-size: 0.85rem; color: var(--text-muted);">Mode Tampilan:</label>
+                    <select id="agenda-view-mode" onchange="toggleAgendaViewMode()" style="width: 140px;">
+                        <option value="year">Rekap Per Tahun</option>
+                        <option value="month">Rekap Per Bulan</option>
+                    </select>
+                </div>
+                <div class="filter-group" id="agenda-month-group" style="display: none;">
+                    <label style="font-size: 0.85rem; color: var(--text-muted);">Pilih Bulan:</label>
+                    <select id="agenda-month-select" onchange="agCurrentPage=1; renderAgendaTable()" style="width: 130px;">
+                        <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                        <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                        <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                        <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="agenda-action-buttons">
+                    <button class="btn btn-success" id="btn-generate-harian" onclick="generateHarianAgenda()">⚡ Generate No. MC (001-867)</button>
+                    <button class="btn btn-secondary" onclick="downloadExcelTemplate('agenda')">📄 Templat Excel</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('import-excel-ag').click()" id="btn-import-ag-label">📥 Impor Excel</button>
+                    <input type="file" id="import-excel-ag" accept=".xlsx, .csv" style="display:none;" onchange="importExcel(event, 'agenda')">
+                    <button class="btn btn-secondary" onclick="exportToExcel('agenda')" id="btn-export-ag-label">📤 Ekspor Excel</button>
+                    <button class="btn btn-secondary" onclick="printReport('agenda')">🖨 Cetak PDF</button>
+                    <button class="btn" onclick="openAgendaModal()">➕ Tambah Agenda</button>
+                </div>
+            </div>
+
+            <div class="action-bar" style="margin-bottom: 8px;">
+                <input type="text" id="search-agenda" placeholder="Cari kegiatan, no mesin..." oninput="agCurrentPage=1; renderAgendaTable()">
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal Plan</th>
+                            <th>Tanggal Selesai</th>
+                            <th>No. Mesin</th>
+                            <th>Nama Mesin</th>
+                            <th>Rencana Pemeliharaan / Task</th>
+                            <th>Teknisi / PIC</th>
+                            <th>Shift</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-ag-body"></tbody>
+                </table>
+            </div>
+            <div id="pagination-ag"></div>
+        </div>
+
+        <!-- TAB: MONITORING KWH -->
+        <div id="tab-kwh" class="tab-pane" style="display: none;">
+            <div class="action-bar">
+                <div class="filter-group">
+                    <label style="font-size: 0.85rem; color: var(--text-muted);">Pilih Bulan:</label>
+                    <select id="kwh-month-select" onchange="kwhCurrentPage=1; renderKwhTable()">
+                        <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                        <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                        <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                        <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="toggleKwhView()" id="btn-toggle-kwh-view">📋 Lihat Catatan Harian</button>
+                    <button class="btn btn-secondary" onclick="downloadKwhTemplate()">📄 Templat Excel kWh</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('import-excel-kwh').click()" id="btn-import-kwh-label">📥 Impor Catatan kWh</button>
+                    <input type="file" id="import-excel-kwh" accept=".xlsx, .csv" style="display:none;" onchange="importKwhExcel(event)">
+                    <button class="btn btn-secondary" onclick="exportKwhActiveView()" id="btn-export-kwh-label">📤 Ekspor Excel</button>
+                    <button class="btn btn-secondary" onclick="printUtilityReport()">🖨 Cetak Bulanan Utility</button>
+                    <button class="btn btn-secondary btn-success" onclick="printMonitoringReport()" style="background-color: var(--purple); color: #fff;">🖨 Cetak Monitoring Bulanan</button>
+                    <button class="btn" onclick="openKwhModal()">➕ Catat Meteran Harian</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="table-monitoring-view">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Total AJ14MDP1 (2000 kVA)</th>
+                            <th>Total Sub KWH (CT)</th>
+                            <th>WJL 14A Murni</th>
+                            <th>WJL 14B (1500 kVA)</th>
+                            <th>WJL 1000 kVA (14C)</th>
+                            <th>Total Pemakaian WJL</th>
+                            <th>Murni PLTS</th>
+                            <th>Total KWH PLN WJL</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-kwh-body"></tbody>
+                    <tfoot id="table-kwh-foot" style="background-color: #1a233a; font-weight: bold; color: var(--primary);"></tfoot>
+                </table>
+
+                <table id="table-utility-view" class="print-view-hidden">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>PLTS Imp</th>
+                            <th>14A Imp</th>
+                            <th>14A Exp</th>
+                            <th>Mess</th>
+                            <th>AB3A</th>
+                            <th>AL2 EX</th>
+                            <th>AL2 KWH</th>
+                            <th>AB3B</th>
+                            <th>Boiler</th>
+                            <th>Demin</th>
+                            <th>RO 150T</th>
+                            <th>RO 60T</th>
+                            <th>WJL 14B</th>
+                            <th>WJL 14C</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-utility-body"></tbody>
+                </table>
+            </div>
+            <div id="pagination-kwh"></div>
+        </div>
+
+        <!-- TAB: MENU SOP -->
+        <div id="tab-sop" class="tab-pane" style="display: none;">
+            <div class="sop-container">
+                <div class="sop-tabs">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="sop-tab-btn active" onclick="switchSopTab('visi', this)">🎯 Visi & Misi</button>
+                        <button class="sop-tab-btn" onclick="switchSopTab('harian', this)">📅 SOP Kerja Harian</button>
+                        <button class="sop-tab-btn" onclick="switchSopTab('perbaikan', this)">🛠️ SOP Perbaikan & Maintenance</button>
+                        <button class="sop-tab-btn" onclick="switchSopTab('k3', this)">🛡️ SOP Keselamatan Kerja (K3)</button>
+                    </div>
+                    <button class="btn btn-secondary" onclick="printSopDocument()">🖨 Cetak SOP / PDF</button>
+                </div>
+                <div id="sop-view-visi" class="sop-content-card"></div>
+                <div id="sop-view-harian" class="sop-content-card" style="display: none;"></div>
+                <div id="sop-view-perbaikan" class="sop-content-card" style="display: none;"></div>
+                <div id="sop-view-k3" class="sop-content-card" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- TAB: SETTINGS & SECURITY -->
+        <div id="tab-settings" class="tab-pane" style="display: none;">
+            <div class="settings-grid">
+                <!-- KARTU PENGATURAN SOP LENGKAP -->
+                <div class="stat-card" style="grid-column: span 2;">
+                    <div>
+                        <h3 style="margin-bottom: 8px; color: var(--purple);">📖 Pengaturan & Revisi Dokumen SOP & Visi Misi</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">
+                            Pilih kategori SOP di bawah ini, lalu perbarui teks panduannya sesuai kebutuhan departemen terbaru.
+                        </p>
+                        <div class="form-row" style="margin-bottom: 10px;">
+                            <div class="form-group">
+                                <label>Pilih Kategori SOP</label>
+                                <select id="settings-sop-category" onchange="loadSopCategoryToEditor()">
+                                    <option value="visi">Visi & Misi</option>
+                                    <option value="harian">SOP Kerja Harian</option>
+                                    <option value="perbaikan">SOP Perbaikan & Maintenance</option>
+                                    <option value="k3">SOP Keselamatan Kerja (K3)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="settings-sop-text" rows="10" placeholder="Masukkan teks SOP..."></textarea>
+                        </div>
+                    </div>
+                    <button class="btn" style="width: 100%; margin-top: 10px; background-color: var(--purple); color: #fff;" onclick="saveSopConfig()">Simpan Revisi SOP Ini</button>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <h3 style="margin-bottom: 8px; color: var(--primary);">🔐 Ubah Password Layar Utama</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">
+                            Digunakan khusus untuk login pembuka layar utama (Default: <strong>bismillah</strong>).
+                        </p>
+                        <div class="form-group" style="margin-bottom: 6px;">
+                            <label>Password Layar Saat Ini</label>
+                            <input type="password" id="pass-current" placeholder="Password lama">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label>Password Layar Baru</label>
+                            <input type="password" id="pass-new" placeholder="Password baru">
+                        </div>
+                    </div>
+                    <button class="btn" style="width: 100%; margin-top: 5px;" onclick="changeSystemPassword()">Simpan Password Layar</button>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <h3 style="margin-bottom: 8px; color: var(--success);">⚙️ Ubah Password Menu Pengaturan</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">
+                            Sandi khusus untuk membuka menu pengaturan (Default: <strong>pengaturan123</strong>).
+                        </p>
+                        <div class="form-group" style="margin-bottom: 6px;">
+                            <label>Password Pengaturan Saat Ini</label>
+                            <input type="password" id="pass-settings-current" placeholder="Password pengaturan lama">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label>Password Pengaturan Baru</label>
+                            <input type="password" id="pass-settings-new" placeholder="Password pengaturan baru">
+                        </div>
+                    </div>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 5px;" onclick="changeSettingsPassword()">Simpan Password Pengaturan</button>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <h3 style="margin-bottom: 8px; color: var(--warning);">🛡️ Ubah Password Verifikasi Histori</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">
+                            Sandi khusus untuk memvalidasi tindakan pengeditan, penghapusan data histori, serta proses restore (Default: <strong>alhamdulillah</strong>).
+                        </p>
+                        <div class="form-group" style="margin-bottom: 6px;">
+                            <label>Password Histori Saat Ini</label>
+                            <input type="password" id="pass-history-current" placeholder="Password histori lama">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label>Password Histori Baru</label>
+                            <input type="password" id="pass-history-new" placeholder="Password histori baru">
+                        </div>
+                    </div>
+                    <button class="btn btn-warning" style="width: 100%; margin-top: 5px;" onclick="changeHistoryPassword()">Simpan Password Histori</button>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <h3 style="margin-bottom: 8px; color: var(--success);">⚡ Sinkronisasi kWh (Produksi)</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">
+                            Impor file backup JSON dari komputer Tim Produksi untuk menyatukan data kWh harian ke sistem pusat (memerlukan password histori).
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button class="btn btn-success" style="flex: 1;" onclick="backupKwhJSON()">📥 Download kWh</button>
+                        <button class="btn btn-secondary" style="flex: 1;" onclick="triggerRestoreKwh()">📤 Restore kWh</button>
+                        <input type="file" id="restore-file-kwh-json" accept=".json" style="display:none;" onchange="restoreKwhJSON(event)">
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <h3 style="margin-bottom: 8px; color: var(--primary);">💾 Cadangan Keseluruhan (Full Database)</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">
+                            Simpan atau pulihkan seluruh data aplikasi secara utuh (Breakdown, Agenda, kWh, & SOP - memerlukan password histori).
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button class="btn" style="flex: 1;" onclick="backupDatabaseJSON()">📥 Full Backup</button>
+                        <button class="btn btn-secondary" style="flex: 1;" onclick="triggerRestoreFull()">📤 Full Restore</button>
+                        <input type="file" id="restore-file-json" accept=".json" style="display:none;" onchange="restoreDatabaseJSON(event)">
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <h3 style="margin-bottom: 8px; color: var(--danger);">🧹 Pembersihan Data Per Bulan</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">
+                            Hapus seluruh data pada bulan & tahun tertentu secara masal (memerlukan password histori).
+                        </p>
+                        <div class="form-row" style="margin-bottom: 10px;">
+                            <div class="form-group">
+                                <label>Bulan</label>
+                                <select id="purge-month">
+                                    <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                                    <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                                    <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                                    <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tahun</label>
+                                <select id="purge-year"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger" style="width: 100%;" onclick="requestPurgeData()">Hapus Data Masal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORM: BREAKDOWN -->
+    <div id="modal-bd" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-bd-title">Tambah Laporan Breakdown</h3>
+                <button class="close-btn" onclick="closeModal('modal-bd')">&times;</button>
+            </div>
+            <form id="form-bd" onsubmit="saveBreakdown(event)">
+                <input type="hidden" id="bd-id">
+                <div class="form-row">
+                    <div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tanggal</label>
+                                <input type="date" id="bd-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Shift Kerja</label>
+                                <select id="bd-shift" required>
+                                    <option value="Shift A">Shift A</option><option value="Shift B">Shift B</option><option value="Shift C">Shift C</option><option value="NS">NS (Non Shift)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Format & No. Mesin</label>
+                                <div style="display: flex; gap: 4px;">
+                                    <select id="bd-machine-mode" onchange="updateMachineOptions('bd')" style="width: 95px;">
+                                        <option value="3digit">001-867 (3D)</option>
+                                        <option value="2digit">1-30 (2D)</option>
+                                    </select>
+                                    <select id="bd-no-mesin" required onchange="checkMachineHistory()" style="flex: 1;"><option value="">-- Pilih --</option></select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Nama Mesin / Peralatan</label>
+                                <select id="bd-nama-mesin" required onchange="checkMachineHistory()">
+                                    <option value="">-- Pilih Mesin --</option>
+                                    <option value="Sizing">Sizing</option><option value="Beaming">Beaming</option><option value="Auto Drawing">Auto Drawing</option><option value="Weaving">Weaving</option><option value="Washing">Washing</option><option value="Inspek / Buka Kain">Inspek / Buka Kain</option><option value="Gulung Kain">Gulung Kain</option><option value="Takel">Takel</option><option value="Hand Palet Elektrik">Hand Palet Elektrik</option><option value="Truk Palet Beam Elektrik">Truk Palet Beam Elektrik</option><option value="SDP">SDP</option><option value="MPL">MPL</option><option value="SPL">SPL</option><option value="SUB">SUB</option><option value="Exhouse Fan">Exhouse Fan</option><option value="CCTV">CCTV</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="history-box" class="history-box"></div>
+                        <div class="form-group">
+                            <label>Kerusakan (Bagian / Kendala)</label>
+                            <input type="text" id="bd-kerusakan" placeholder="Contoh: Inverter error / Kabel putus..." required>
+                        </div>
+                        <div class="form-row-3">
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label>Sparepart yang Diganti</label>
+                                <input type="text" id="bd-sparepart" placeholder="Nama sparepart...">
+                            </div>
+                            <div class="form-group">
+                                <label>Jumlah</label>
+                                <input type="number" step="1" id="bd-sparepart-qty" value="0" min="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Ukuran Sparepart</label>
+                            <input type="text" id="bd-sparepart-size" placeholder="Contoh: 15kW, 400V, 10A...">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label>Start Jam</label>
+                                <input type="time" id="bd-start-time" onchange="calculateTotalHours()" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Selesai Jam</label>
+                                <input type="time" id="bd-end-time" onchange="calculateTotalHours()" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Total Jam</label>
+                                <input type="number" step="0.01" id="bd-total-time" readonly style="background-color: #1e293b; color: var(--primary); font-weight: bold;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Teknisi / PIC</label>
+                            <select id="bd-teknisi" required>
+                                <option value="">-- Pilih Teknisi --</option>
+                                <option value="Ahmad S">Ahmad S</option><option value="Cece S">Cece S</option><option value="Untung">Untung</option><option value="Agung E N">Agung E N</option><option value="Erpan S">Erpan S</option><option value="Nuryanto">Nuryanto</option><option value="Asep S">Asep S</option><option value="Ahmad F">Ahmad F</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status Penanganan</label>
+                            <select id="bd-status">
+                                <option value="Selesai">Selesai</option><option value="Proses">Proses</option><option value="Over Shift">Over Shift (Lanjut Shift Berikutnya)</option><option value="Pending">Pending (Tunggu Sparepart)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tindakan Perbaikan</label>
+                            <textarea id="bd-tindakan" rows="4" placeholder="Deskripsi kronologi & tindakan perbaikan..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-bd')">Batal</button>
+                    <button type="submit" class="btn">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL FORM: AGENDA -->
+    <div id="modal-ag" class="modal">
+        <div class="modal-content" style="max-width: 540px;">
+            <div class="modal-header">
+                <h3 id="modal-ag-title">Tambah Agenda PM</h3>
+                <button class="close-btn" onclick="closeModal('modal-ag')">&times;</button>
+            </div>
+            <form id="form-ag" onsubmit="saveAgenda(event)">
+                <input type="hidden" id="ag-id">
+                <input type="hidden" id="ag-tipe" value="bulanan">
+                <input type="hidden" id="ag-created-at" value="">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tanggal Plan (Mulai)</label>
+                        <input type="date" id="ag-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Selesai (Aktual)</label>
+                        <input type="date" id="ag-end-date">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Format & No. Mesin</label>
+                        <div style="display: flex; gap: 4px;">
+                            <select id="ag-machine-mode" onchange="updateMachineOptions('ag')" style="width: 95px;">
+                                <option value="3digit">001-867 (3D)</option>
+                                <option value="2digit">1-30 (2D)</option>
+                            </select>
+                            <select id="ag-no-mesin" required style="flex: 1;"><option value="">-- Pilih --</option></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Shift Kerja</label>
+                        <select id="ag-shift">
+                            <option value="">-- Pilih Shift --</option>
+                            <option value="Shift A">Shift A</option><option value="Shift B">Shift B</option><option value="Shift C">Shift C</option><option value="NS">NS (Non Shift)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nama Mesin / Peralatan (Dikunci)</label>
+                        <select id="ag-nama-mesin" required disabled style="background-color: #1e293b; color: var(--primary);">
+                            <option value="Weaving">Weaving</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Teknisi / PIC</label>
+                        <select id="ag-teknisi" required>
+                            <option value="">-- Pilih Teknisi --</option>
+                            <option value="Ahmad S">Ahmad S</option><option value="Cece S">Cece S</option><option value="Untung">Untung</option><option value="Agung E N">Agung E N</option><option value="Erpan S">Erpan S</option><option value="Nuryanto">Nuryanto</option><option value="Asep S">Asep S</option><option value="Ahmad F">Ahmad F</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Status</label>
+                        <select id="ag-status">
+                            <option value="Scheduled">Scheduled</option><option value="Selesai">Selesai</option><option value="Tunda">Tunda</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Rencana Tugas / Preventive Maintenance</label>
+                    <textarea id="ag-task" rows="2" placeholder="Pembersihan panel, periksa kabel..." required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-ag')">Batal</button>
+                    <button type="submit" class="btn">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL FORM: KWH METER TERKELOMPOK -->
+    <div id="modal-kwh" class="modal">
+        <div class="modal-content" style="max-width: 720px;">
+            <div class="modal-header">
+                <h3 id="modal-kwh-title">Catat Meteran kWh Harian (Alur Lapangan WJL)</h3>
+                <button class="close-btn" onclick="closeModal('modal-kwh')">&times;</button>
+            </div>
+            <form id="form-kwh" onsubmit="saveKwh(event)">
+                <input type="hidden" id="kwh-id">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Tanggal Pencatatan</label>
+                    <input type="date" id="kwh-date" required style="width: 200px;">
+                </div>
+                <div style="font-size: 0.8rem; font-weight: bold; color: var(--primary); margin-bottom: 6px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
+                    KELOMPOK 1: SUMBER UTAMA & NETTING (MDP 1 - WJL 14A & PLTS)
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>PLTS Import Meter</label><input type="number" step="0.1" id="m-plts-import" required></div>
+                    <div class="form-group"><label>WJL 14A Import Meter (AJ14MDP1)</label><input type="number" step="0.1" id="m-14a-import" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>WJL 14A Export Meter</label><input type="number" step="0.1" id="m-14a-export" value="0.1"></div>
+                    <div class="form-group"></div>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; margin-bottom: 4px;">Sub-Panel Pengurang / Beban Luar di MDP 1 (Faktor CT):</div>
+                <div class="form-row-3">
+                    <div class="form-group"><label>Mess Keluarga</label><input type="number" step="0.1" id="m-mess" required></div>
+                    <div class="form-group"><label>AB3A (CT x160)</label><input type="number" step="0.1" id="m-ab3a" required></div>
+                    <div class="form-group"><label>AL2 EX Spinning 3</label><input type="number" step="0.1" id="m-al2ex" required></div>
+                </div>
+                <div class="form-row-3">
+                    <div class="form-group"><label>AL2 KWH 3 (CT x320)</label><input type="number" step="0.1" id="m-al2kwh" required></div>
+                    <div class="form-group"><label>AB3B (CT x160)</label><input type="number" step="0.1" id="m-ab3b" required></div>
+                    <div class="form-group"><label>Air Bersih Boiler</label><input type="number" step="0.1" id="m-boiler" required></div>
+                </div>
+                <div class="form-row-3">
+                    <div class="form-group"><label>Demin 1 Kurita</label><input type="number" step="0.1" id="m-demin" required></div>
+                    <div class="form-group"><label>RO 150T AB3</label><input type="number" step="0.1" id="m-ro150" required></div>
+                    <div class="form-group"><label>RO 60T AB3</label><input type="number" step="0.1" id="m-ro60" required></div>
+                </div>
+                <div style="font-size: 0.8rem; font-weight: bold; color: var(--warning); margin-top: 12px; margin-bottom: 6px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
+                    KELOMPOK 2: TRAFO / MDP MANDIRI (WJL 14B & WJL 14C)
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>WJL 14B Meter (Trafo 1500 kVA - AJ14MDP2)</label><input type="number" step="0.1" id="m-14b" required></div>
+                    <div class="form-group"><label>WJL 1000 kVA (14C)</label><input type="number" step="0.1" id="m-14c" required></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-kwh')">Batal</button>
+                    <button type="submit" class="btn">Simpan & Hitung Otomatis</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH TAHUN -->
+    <div id="modal-add-year" class="modal">
+        <div class="modal-content" style="max-width: 300px;">
+            <div class="modal-header">
+                <h3>Tambah Tahun</h3>
+                <button class="close-btn" onclick="closeModal('modal-add-year')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Masukkan Tahun Baru</label>
+                <input type="number" id="new-year-input" placeholder="2028">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modal-add-year')">Batal</button>
+                <button class="btn" onclick="addNewYear()">Tambah</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL VERIFIKASI PASSWORD KHUSUS HISTORI -->
+    <div id="modal-auth" class="modal">
+        <div class="modal-content" style="max-width: 320px;">
+            <div class="modal-header">
+                <h3>Verifikasi Password Histori</h3>
+                <button class="close-btn" onclick="closeModal('modal-auth')">&times;</button>
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom: 10px;">Aksi edit/hapus data histori lampau atau pemulihan data (restore) memerlukan password verifikasi histori.</p>
+            <div class="form-group">
+                <input type="password" id="auth-password" placeholder="Masukkan password histori">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modal-auth')">Batal</button>
+                <button class="btn btn-danger" onclick="executeAuthenticatedAction()">Konfirmasi</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAdminPass = localStorage.getItem('wjl_admin_pass') || "bismillah";
+        let currentSettingsPass = localStorage.getItem('wjl_settings_pass') || "pengaturan123";
+        let currentHistoryPass = localStorage.getItem('wjl_history_pass') || "alhamdulillah";
+
+        // Default SOP & Visi Misi Data
+        let defaultSopData = {
+            visi: `VISI DIVISI ELEKTRIK DEPT. WJL:\n"Menjadi departemen pemeliharaan kelistrikan yang andal, responsif, dan profesional untuk mendukung produktivitas mesin Water Jet Loom secara maksimal dan efisien."\n\nMISI DIVISI ELEKTRIK:\n1. Menjaga keandalan mesin produksi melalui program Preventive & Corrective Maintenance yang terstruktur.\n2. Merespon gangguan kelistrikan (breakdown) secara cepat, tepat, dan aman guna meminimalkan down time.\n3. Mengoptimalkan efisiensi pemakaian energi listrik dan pengelolaan utilitas pabrik.\n4. Meningkatkan kompetensi teknisi secara berkala dan menerapkan standar Keselamatan Kerja (K3) di setiap lini.`,
+            harian: `1. Pengecekan Awal Shift:\n- Melakukan serah terima tugas (handover) dengan teknisi shift sebelumnya.\n- Memeriksa logbook kerusakan dan catatan pending operasional mesin.\n- Mengecek ketersediaan alat kerja utama dan radio/komunikasi.\n\n2. Monitoring & Patroli Rutin:\n- Melakukan patroli berkala pada panel kontrol utama (MDP & Sub-Panel) setiap 4 jam.\n- Memeriksa kestabilan suhu motor penggerak dan inverter (Rhymebus, Allen-Bradley, dll).\n- Memastikan lampu indikator, sensor (Leno, CCR, CCF), dan sistem pengaman berjalan normal.\n\n3. Pencatatan & Pelaporan:\n- Mencatat meteran kWh harian utilitas dan WJL.\n- Melaporkan setiap temuan kejanggalan kepada Supervisor atau Head Dept.`,
+            perbaikan: `1. Penanganan Breakdown:\n- Tanggapi panggilan mesin breakdown dengan sigap dan utamakan keselamatan kerja.\n- Lakukan analisis gejala kerusakan (Troubleshooting) pada sistem kontrol, HMI, PLC, atau motor.\n- Catat sparepart yang diganti beserta ukurannya ke dalam sistem.\n\n2. Perawatan Preventif (PM):\n- Laksanakan jadwal pemeliharaan bulanan sesuai daftar agenda mesin (001-867).\n- Bersihkan debu/kapas di dalam panel menggunakan vacuum/kuas halus.\n- Periksa kekencangan baut terminal kabel power, kontaktor, dan MCB secara berkala.\n\n3. Penutupan Tugas:\n- Pastikan mesin telah diuji coba (trial run) dengan normal sebelum diserahterimakan kembali ke bagian produksi.`,
+            k3: `ATURAN KESELAMATAN KERJA (K3) DIVISI ELEKTRIK:\n\n1. Prosedur LOTO (Lock Out / Tag Out):\n- Wajib mematikan main breaker (OFF) dan memasang tanda peringatan (Tag Out) sebelum membuka panel bertegangan tinggi.\n- Pastikan tegangan benar-benar nol (0 Volt) menggunakan multimeter sebelum memegang komponen.\n\n2. Alat Pelindung Diri (APD):\n- Selalu kenakan sepatu safety (pelindung kaki), pakaian kerja standar, dan kacamata pelindung jika diperlukan.\n\n3. Penanganan Alat & Area Kerja:\n- Jaga kebersihan area kerja dari ceceran oli, air, atau kabel telanjang.\n- Dilarang merokok atau makan di dekat panel kontrol listrik utama.\n- Laporkan segera kepada tim K3 jika terjadi insiden atau kondisi darurat kelistrikan.`
+        };
+
+        let currentSopData = JSON.parse(localStorage.getItem('wjl_sop_data')) || defaultSopData;
+
+        let currentYear = new Date().getFullYear();
+        let activeYears = JSON.parse(localStorage.getItem('wjl_years')) || [2024, 2025, 2026, 2027];
+        if (!activeYears.includes(currentYear)) activeYears.push(currentYear);
+
+        let dbBreakdown = JSON.parse(localStorage.getItem('wjl_breakdown')) || [];
+        let dbAgenda = JSON.parse(localStorage.getItem('wjl_agenda')) || [];
+        let dbKwh = JSON.parse(localStorage.getItem('wjl_kwh')) || [];
+        let pendingAuthAction = null;
+        let isUtilityViewActive = false;
+        let agendaMode = 'harian';
+        let breakdownSubMode = 'harian';
+        let activeSopCategory = 'visi';
+
+        // Paginasi Per Halaman
+        let bdCurrentPage = 1;
+        let agCurrentPage = 1;
+        let kwhCurrentPage = 1;
+        const rowsPerPage = 25;
+
+        function getLocalDateString(date = new Date()) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        window.onload = () => {
+            initMachineOptions('bd');
+            initMachineOptions('ag');
+            initYearSelectors();
+            renderSopContent();
+            
+            const kwhMonthEl = document.getElementById('kwh-month-select');
+            if(kwhMonthEl) kwhMonthEl.value = new Date().getMonth() + 1;
+            
+            const dashMonthEl = document.getElementById('dashboard-month-select');
+            if(dashMonthEl) dashMonthEl.value = new Date().getMonth() + 1;
+
+            const bdMonthEl = document.getElementById('breakdown-month-select');
+            if(bdMonthEl) bdMonthEl.value = new Date().getMonth() + 1;
+
+            const agMonthEl = document.getElementById('agenda-month-select');
+            if(agMonthEl) agMonthEl.value = new Date().getMonth() + 1;
+
+            loadSopCategoryToEditor();
+
+            renderDashboard();
+            renderBreakdownTable();
+            renderAgendaTable();
+            renderKwhTable();
+        };
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const passInput = document.getElementById('login-password').value;
+            const errDiv = document.getElementById('login-error');
+            if (passInput === currentAdminPass) {
+                document.getElementById('login-screen').style.display = 'none';
+                errDiv.style.display = 'none';
+                document.getElementById('login-password').value = '';
+            } else {
+                errDiv.style.display = 'block';
+            }
+        }
+
+        function logoutSystem() {
+            if (confirm("Keluar dari sistem WJL Elektrik?")) {
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('login-password').value = '';
+                document.getElementById('login-password').focus();
+            }
+        }
+
+        let settingsTargetBtn = null;
+        function requestOpenSettings(btnEl) {
+            settingsTargetBtn = btnEl;
+            document.getElementById('settings-auth-password').value = '';
+            openModal('modal-settings-auth');
+        }
+
+        function verifySettingsAccess() {
+            const passInput = document.getElementById('settings-auth-password').value;
+            if (passInput === currentSettingsPass) {
+                closeModal('modal-settings-auth');
+                switchTab('settings', settingsTargetBtn);
+            } else {
+                alert("Password pengaturan salah!");
+            }
+        }
+
+        function switchSopTab(sopKey, btnEl) {
+            activeSopCategory = sopKey;
+            document.querySelectorAll('.sop-content-card').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.sop-tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('sop-view-' + sopKey).style.display = 'block';
+            btnEl.classList.add('active');
+        }
+
+        function renderSopContent() {
+            document.getElementById('sop-view-visi').innerText = currentSopData.visi;
+            document.getElementById('sop-view-harian').innerText = currentSopData.harian;
+            document.getElementById('sop-view-perbaikan').innerText = currentSopData.perbaikan;
+            document.getElementById('sop-view-k3').innerText = currentSopData.k3;
+        }
+
+        function printSopDocument() {
+            const titles = { visi: 'VISI & MISI', harian: 'SOP KERJA HARIAN', perbaikan: 'SOP PERBAIKAN & MAINTENANCE', k3: 'SOP KESELAMATAN KERJA (K3)' };
+            document.getElementById('print-sub-header').innerText = `DOKUMEN RESMI SOP: ${titles[activeSopCategory] || 'SOP ELEKTRIK'}`;
+            window.print();
+        }
+
+        function loadSopCategoryToEditor() {
+            const cat = document.getElementById('settings-sop-category').value;
+            document.getElementById('settings-sop-text').value = currentSopData[cat] || '';
+        }
+
+        function saveSopConfig() {
+            const cat = document.getElementById('settings-sop-category').value;
+            const txt = document.getElementById('settings-sop-text').value;
+            if (!txt.trim()) { alert('Teks SOP tidak boleh kosong!'); return; }
+            currentSopData[cat] = txt;
+            localStorage.setItem('wjl_sop_data', JSON.stringify(currentSopData));
+            renderSopContent();
+            alert('Revisi dokumen SOP berhasil disimpan!');
+        }
+
+        function isReportFromToday(reportDateStr) {
+            if (!reportDateStr) return false;
+            const todayStr = getLocalDateString();
+            return reportDateStr === todayStr;
+        }
+
+        function isLockedAfter24Hours(item) {
+            if (item.status !== 'Selesai') return false;
+            const createdAt = item.createdAt || new Date(item.tanggal).getTime();
+            const now = Date.now();
+            const diffHours = (now - createdAt) / (1000 * 60 * 60);
+            return diffHours > 24;
+        }
+
+        function getYearAndMonthFromDateStr(dateStr) {
+            if (!dateStr) return { year: currentYear, month: 1 };
+            const parts = dateStr.split('-');
+            const year = parseInt(parts[0], 10) || currentYear;
+            const month = parseInt(parts[1], 10) || 1;
+            return { year, month };
+        }
+
+        function changeSystemPassword() {
+            const oldPass = document.getElementById('pass-current').value;
+            const newPass = document.getElementById('pass-new').value;
+            if (oldPass !== currentAdminPass) { alert('Password layar utama saat ini salah!'); return; }
+            if (!newPass || newPass.length < 4) { alert('Password baru minimal 4 karakter!'); return; }
+            currentAdminPass = newPass;
+            localStorage.setItem('wjl_admin_pass', newPass);
+            document.getElementById('pass-current').value = '';
+            document.getElementById('pass-new').value = '';
+            alert('Password layar utama berhasil diperbarui!');
+        }
+
+        function changeSettingsPassword() {
+            const oldPass = document.getElementById('pass-settings-current').value;
+            const newPass = document.getElementById('pass-settings-new').value;
+            if (oldPass !== currentSettingsPass) { alert('Password pengaturan saat ini salah!'); return; }
+            if (!newPass || newPass.length < 4) { alert('Password baru minimal 4 karakter!'); return; }
+            currentSettingsPass = newPass;
+            localStorage.setItem('wjl_settings_pass', newPass);
+            document.getElementById('pass-settings-current').value = '';
+            document.getElementById('pass-settings-new').value = '';
+            alert('Password menu pengaturan berhasil diperbarui!');
+        }
+
+        function changeHistoryPassword() {
+            const oldPass = document.getElementById('pass-history-current').value;
+            const newPass = document.getElementById('pass-history-new').value;
+            if (oldPass !== currentHistoryPass) { alert('Password histori saat ini salah!'); return; }
+            if (!newPass || newPass.length < 4) { alert('Password histori baru minimal 4 karakter!'); return; }
+            currentHistoryPass = newPass;
+            localStorage.setItem('wjl_history_pass', newPass);
+            document.getElementById('pass-history-current').value = '';
+            document.getElementById('pass-history-new').value = '';
+            alert('Password verifikasi histori berhasil diperbarui!');
+        }
+
+        function initMachineOptions(prefix, selectedVal = '') {
+            const modeEl = document.getElementById(prefix + '-machine-mode');
+            const selectEl = document.getElementById(prefix + '-no-mesin');
+            if(!selectEl || !modeEl) return;
+
+            const mode = modeEl.value;
+            selectEl.innerHTML = '<option value="">-- Pilih --</option>';
+
+            if (mode === '2digit') {
+                for (let i = 1; i <= 30; i++) {
+                    const valStr = String(i);
+                    selectEl.add(new Option(valStr, valStr));
+                }
+            } else {
+                for (let i = 1; i <= 876; i++) {
+                    const formatted = String(i).padStart(3, '0');
+                    selectEl.add(new Option(formatted, formatted));
+                }
+            }
+
+            if (selectedVal) {
+                selectEl.value = selectedVal;
+            }
+        }
+
+        function updateMachineOptions(prefix) {
+            initMachineOptions(prefix);
+        }
+
+        function calculateTotalHours() {
+            const startTime = document.getElementById('bd-start-time').value;
+            const endTime = document.getElementById('bd-end-time').value;
+            if (startTime && endTime) {
+                const start = new Date(`1970-01-01T${startTime}:00`);
+                let end = new Date(`1970-01-01T${endTime}:00`);
+                if (end < start) end = new Date(`1970-01-02T${endTime}:00`);
+                document.getElementById('bd-total-time').value = ((end - start) / (1000 * 60 * 60)).toFixed(2);
+            } else {
+                document.getElementById('bd-total-time').value = '0';
+            }
+        }
+
+        function checkMachineHistory() {
+            const no = document.getElementById('bd-no-mesin').value;
+            const nama = document.getElementById('bd-nama-mesin').value;
+            const box = document.getElementById('history-box');
+            if (no && nama) {
+                const history = dbBreakdown.filter(x => x.noMesin === no && x.namaMesin === nama);
+                if (history.length > 0) {
+                    let html = `<strong>Riwayat Kerusakan Mesin Ini (${history.length}x):</strong><br>`;
+                    history.slice(-3).reverse().forEach(h => { html += `• ${h.tanggal} [${h.kerusakan}]: ${h.tindakan} (${h.status})<br>`; });
+                    box.innerHTML = html;
+                    box.style.display = 'block';
+                    return;
+                }
+            }
+            box.style.display = 'none';
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('wjl_years', JSON.stringify(activeYears));
+                localStorage.setItem('wjl_breakdown', JSON.stringify(dbBreakdown));
+                localStorage.setItem('wjl_agenda', JSON.stringify(dbAgenda));
+                localStorage.setItem('wjl_kwh', JSON.stringify(dbKwh));
+                localStorage.setItem('wjl_sop_data', JSON.stringify(currentSopData));
+            } catch (err) {
+                alert("Penyimpanan lokal penuh. Gunakan opsi Full Backup untuk mereset data lama.");
+            }
+        }
+
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.nav-menu button').forEach(el => {
+                if(!el.classList.contains('btn-logout')) el.classList.remove('active');
+            });
+            document.getElementById('tab-' + tabId).style.display = 'flex';
+            if (btnElement && btnElement.classList) {
+                btnElement.classList.add('active');
+            }
+
+            const titles = {
+                dashboard: "Dasbor Utama",
+                breakdown: "Laporan Breakdown Mesin",
+                agenda: "Agenda & Preventive Maintenance",
+                kwh: "Monitoring & Rekapitulasi kWh Listrik",
+                sop: "Standar Operasional Prosedur (SOP)",
+                settings: "Pengaturan & Keamanan System"
+            };
+            document.getElementById('page-title').innerText = titles[tabId];
+            if(tabId === 'dashboard') renderDashboard();
+            if(tabId === 'kwh') renderKwhTable();
+            if(tabId === 'agenda') renderAgendaTable();
+            if(tabId === 'breakdown') renderBreakdownTable();
+        }
+
+        function toggleKwhView() {
+            const monitoringTable = document.getElementById('table-monitoring-view');
+            const utilityTable = document.getElementById('table-utility-view');
+            const btnToggle = document.getElementById('btn-toggle-kwh-view');
+            const btnImportLabel = document.getElementById('btn-import-kwh-label');
+
+            isUtilityViewActive = !isUtilityViewActive;
+
+            if (isUtilityViewActive) {
+                monitoringTable.classList.add('print-view-hidden');
+                utilityTable.classList.remove('print-view-hidden');
+                btnToggle.innerHTML = "📊 Lihat Rekap Monitoring";
+                btnToggle.classList.add('btn-success');
+                btnImportLabel.innerHTML = "📥 Impor Catatan Utility";
+            } else {
+                utilityTable.classList.add('print-view-hidden');
+                monitoringTable.classList.remove('print-view-hidden');
+                btnToggle.innerHTML = "📋 Lihat Catatan Harian";
+                btnToggle.classList.remove('btn-success');
+                btnImportLabel.innerHTML = "📥 Impor Catatan kWh";
+            }
+        }
+
+        function initYearSelectors() {
+            const selectYear = document.getElementById('select-year');
+            const purgeYear = document.getElementById('purge-year');
+            if (!selectYear) return;
+            selectYear.innerHTML = ''; 
+            if(purgeYear) purgeYear.innerHTML = '';
+            
+            activeYears.sort().forEach(y => { 
+                selectYear.add(new Option(y, y)); 
+                if(purgeYear) purgeYear.add(new Option(y, y)); 
+            });
+            selectYear.value = currentYear; 
+            if(purgeYear) purgeYear.value = currentYear;
+        }
+
+        function changeYear(yr) {
+            currentYear = parseInt(yr);
+            const selectYearEl = document.getElementById('select-year');
+            if (selectYearEl) selectYearEl.value = currentYear;
+            
+            renderDashboard(); 
+            renderBreakdownTable(); 
+            renderAgendaTable(); 
+            renderKwhTable();
+        }
+
+        function addNewYear() {
+            const val = parseInt(document.getElementById('new-year-input').value);
+            if(val && !activeYears.includes(val)) {
+                activeYears.push(val); saveData(); initYearSelectors();
+                document.getElementById('select-year').value = val;
+                changeYear(val); closeModal('modal-add-year');
+            }
+        }
+
+        function toggleDashboardMode() {
+            const mode = document.getElementById('dashboard-mode').value;
+            const monthGroup = document.getElementById('dashboard-month-group');
+            if (mode === 'month') {
+                monthGroup.style.display = 'flex';
+            } else {
+                monthGroup.style.display = 'none';
+            }
+            renderDashboard();
+        }
+
+        function toggleBreakdownMode() {
+            const mode = document.getElementById('breakdown-mode').value;
+            const monthGroup = document.getElementById('breakdown-month-group');
+            if (mode === 'month') {
+                monthGroup.style.display = 'flex';
+            } else {
+                monthGroup.style.display = 'none';
+            }
+            renderBreakdownTable();
+        }
+
+        function toggleAgendaViewMode() {
+            const mode = document.getElementById('agenda-view-mode').value;
+            const monthGroup = document.getElementById('agenda-month-group');
+            if (mode === 'month') {
+                monthGroup.style.display = 'flex';
+            } else {
+                monthGroup.style.display = 'none';
+            }
+            renderAgendaTable();
+        }
+
+        function requireHistoryAuth(cb) { pendingAuthAction = cb; document.getElementById('auth-password').value = ''; openModal('modal-auth'); }
+        function executeAuthenticatedAction() {
+            if(document.getElementById('auth-password').value === currentHistoryPass) {
+                closeModal('modal-auth'); if(pendingAuthAction) pendingAuthAction();
+            } else { alert('Password histori salah!'); }
+        }
+
+        function renderDashboard() {
+            const mode = document.getElementById('dashboard-mode').value;
+            let filteredBD, filteredAG, filteredKWH;
+
+            if (mode === 'month') {
+                const selMonth = parseInt(document.getElementById('dashboard-month-select').value);
+                filteredBD = dbBreakdown.filter(item => {
+                    const dt = getYearAndMonthFromDateStr(item.tanggal);
+                    return dt.year === currentYear && dt.month === selMonth;
+                });
+                filteredAG = dbAgenda.filter(item => {
+                    const dt = getYearAndMonthFromDateStr(item.tanggal);
+                    return dt.year === currentYear && dt.month === selMonth && item.status !== 'Selesai';
+                });
+                filteredKWH = dbKwh.filter(item => {
+                    const dt = getYearAndMonthFromDateStr(item.tanggal);
+                    return dt.year === currentYear && dt.month === selMonth;
+                });
+
+                document.getElementById('label-stat-bd').innerText = `Total Kejadian Breakdown (Bulan ${selMonth})`;
+                document.getElementById('label-stat-dt').innerText = `Total Down Time (Bulan ${selMonth})`;
+                document.getElementById('label-stat-kwh').innerText = `Total Pemakaian kWh PLN (Bulan ${selMonth})`;
+                document.getElementById('label-stat-pm').innerText = `Agenda PM Belum Selesai (Bulan ${selMonth})`;
+                document.getElementById('title-chart-downtime').innerText = `Tren Down Time Harian - Bulan ${selMonth} (Jam)`;
+            } else {
+                filteredBD = dbBreakdown.filter(item => {
+                    const dt = getYearAndMonthFromDateStr(item.tanggal);
+                    return dt.year === currentYear;
+                });
+                filteredAG = dbAgenda.filter(item => {
+                    const dt = getYearAndMonthFromDateStr(item.tanggal);
+                    return dt.year === currentYear && item.status !== 'Selesai';
+                });
+                filteredKWH = dbKwh.filter(item => {
+                    const dt = getYearAndMonthFromDateStr(item.tanggal);
+                    return dt.year === currentYear;
+                });
+
+                document.getElementById('label-stat-bd').innerText = "Total Kejadian Breakdown (Tahunan)";
+                document.getElementById('label-stat-dt').innerText = "Total Down Time (Tahunan)";
+                document.getElementById('label-stat-kwh').innerText = "Total Pemakaian kWh PLN (Tahunan)";
+                document.getElementById('label-stat-pm').innerText = "Agenda PM Mendatang / Status";
+                document.getElementById('title-chart-downtime').innerText = "Tren Down Time Per Bulan (Jam)";
+            }
+
+            document.getElementById('stat-total-bd').innerText = filteredBD.length;
+            document.getElementById('stat-total-dt').innerText = filteredBD.reduce((a,c) => a + parseFloat(c.totalJam || 0), 0).toFixed(1) + ' Jam';
+            document.getElementById('stat-total-kwh').innerText = Math.round(filteredKWH.reduce((a,c) => a + (c.totalPlnWjl || 0), 0)).toLocaleString('id-ID') + ' kWh';
+            document.getElementById('stat-pending-pm').innerText = filteredAG.length;
+
+            renderDowntimeChart(filteredBD, mode); renderItemChart(filteredBD); renderSparepartChart(filteredBD);
+        }
+
+        function renderDowntimeChart(data, mode) {
+            const canvas = document.getElementById('chart-downtime');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight;
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+
+            if (mode === 'month') {
+                const selMonth = parseInt(document.getElementById('dashboard-month-select').value);
+                const daysInMonth = new Date(currentYear, selMonth, 0).getDate();
+                const vals = new Array(daysInMonth).fill(0);
+                data.forEach(item => {
+                    const parts = (item.tanggal || "").split('-');
+                    const day = parseInt(parts[2], 10);
+                    if(day >= 1 && day <= daysInMonth) vals[day - 1] += parseFloat(item.totalJam || 0);
+                });
+
+                const max = Math.max(...vals, 5), pad = 20, w = canvas.width - pad*2, h = canvas.height - pad*2;
+                ctx.strokeStyle = '#334155'; ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif';
+                for(let i=0; i<=4; i++) { let y = pad + (h/4)*i; ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(canvas.width-pad, y); ctx.stroke(); }
+                
+                const bw = Math.max(2, (w / daysInMonth) - 2);
+                vals.forEach((v, i) => {
+                    let x = pad + i*(w/daysInMonth), bh = (v/max)*h, y = canvas.height - pad - bh;
+                    ctx.fillStyle = '#38bdf8'; ctx.fillRect(x, y, bw, bh);
+                    if((i+1) % 5 === 0 || i === 0) {
+                        ctx.fillStyle = '#94a3b8'; ctx.fillText(i+1, x, canvas.height - 5);
+                    }
+                });
+            } else {
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
+                const vals = new Array(12).fill(0);
+                data.forEach(item => {
+                    const dt = getYearAndMonthFromDateStr(item.tanggal);
+                    if (dt.month >= 1 && dt.month <= 12) vals[dt.month - 1] += parseFloat(item.totalJam || 0);
+                });
+                
+                const max = Math.max(...vals, 10), pad = 20, w = canvas.width - pad*2, h = canvas.height - pad*2;
+                ctx.strokeStyle = '#334155'; ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif';
+                for(let i=0; i<=4; i++) { let y = pad + (h/4)*i; ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(canvas.width-pad, y); ctx.stroke(); }
+                const bw = w/12 - 6;
+                vals.forEach((v, i) => {
+                    let x = pad + i*(w/12) + 3, bh = (v/max)*h, y = canvas.height - pad - bh;
+                    ctx.fillStyle = '#38bdf8'; ctx.fillRect(x, y, bw, bh);
+                    ctx.fillStyle = '#94a3b8'; ctx.fillText(months[i], x, canvas.height - 5);
+                });
+            }
+        }
+
+        function renderItemChart(data) {
+            const canvas = document.getElementById('chart-items');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight;
+            const counts = {}; data.forEach(i => { let k = i.kerusakan || i.item || 'Lain'; counts[k] = (counts[k] || 0) + 1; });
+            const labels = Object.keys(counts), vals = Object.values(counts), colors = ['#38bdf8','#10b981','#f59e0b','#ef4444','#a855f7','#ec4899'];
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            if(labels.length === 0) { ctx.fillStyle = '#94a3b8'; ctx.fillText('Tidak ada data', canvas.width/2-30, canvas.height/2); return; }
+            const total = vals.reduce((a,b)=>a+b,0); let start = 0, cx = canvas.width/3, cy = canvas.height/2, r = Math.min(cx,cy)-15;
+            labels.slice(0, 6).forEach((l, i) => {
+                let angle = (vals[i]/total)*2*Math.PI;
+                ctx.fillStyle = colors[i%colors.length];
+                ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,start,start+angle); ctx.closePath(); ctx.fill();
+                let lx = canvas.width*0.58, ly = 20 + i*20;
+                ctx.fillRect(lx, ly, 10, 10); ctx.fillStyle = '#f8fafc'; ctx.fillText(`${l.substring(0,12)} (${vals[i]})`, lx+16, ly+9);
+                start += angle;
+            });
+        }
+
+        function renderSparepartChart(data) {
+            const canvas = document.getElementById('chart-spareparts');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight;
+            const counts = {}; data.forEach(i => { const sp = (i.sparepart||'').trim(); if(sp && sp !== '-' && sp.toLowerCase() !== 'tidak ada') counts[sp] = (counts[sp]||0) + parseInt(i.sparepartQty || 1); });
+            const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            if(sorted.length === 0) { ctx.fillStyle = '#94a3b8'; ctx.fillText('Belum ada data sparepart', canvas.width/2-70, canvas.height/2); return; }
+            const max = Math.max(...sorted.map(x=>x[1]), 5), pl = 120, cw = canvas.width - pl - 30, rh = (canvas.height - 20)/sorted.length;
+            sorted.forEach(([name, cnt], i) => {
+                let y = 10 + i*rh, bw = (cnt/max)*cw;
+                ctx.fillStyle = '#f8fafc'; ctx.textAlign = 'right'; ctx.fillText(name.length>16?name.substring(0,14)+'..':name, pl-8, y+14);
+                ctx.fillStyle = '#f59e0b'; ctx.fillRect(pl, y+2, bw, rh-8);
+                ctx.fillStyle = '#f8fafc'; ctx.textAlign = 'left'; ctx.fillText(`${cnt} unit`, pl+bw+6, y+14);
+            });
+        }
+
+        function resetBdFilter() { document.getElementById('search-bd').value=''; document.getElementById('bd-filter-start').value=''; document.getElementById('bd-filter-end').value=''; bdCurrentPage=1; renderBreakdownTable(); }
+        
+        function toggleBreakdownSubMode() {
+            breakdownSubMode = document.getElementById('breakdown-sub-mode').value;
+            bdCurrentPage = 1;
+            const contHarian = document.getElementById('container-bd-harian');
+            const contSparepart = document.getElementById('container-bd-sparepart');
+
+            if (breakdownSubMode === 'sparepart') {
+                contHarian.classList.add('print-view-hidden');
+                contSparepart.classList.remove('print-view-hidden');
+            } else {
+                contSparepart.classList.add('print-view-hidden');
+                contHarian.classList.remove('print-view-hidden');
+            }
+            renderBreakdownTable();
+        }
+
+        function renderPaginationControls(totalData, currentPage, changePageFunc) {
+            const totalPages = Math.ceil(totalData / rowsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            let html = `<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 8px 8px; font-size: 0.82rem; color: var(--text-muted); flex-shrink: 0;">`;
+            html += `<div>Menampilkan Halaman <strong>${currentPage}</strong> dari <strong>${totalPages}</strong> (Total ${totalData} Data)</div>`;
+            html += `<div style="display: flex; gap: 6px;">`;
+            html += `<button class="btn btn-secondary" style="padding: 3px 10px;" onclick="${changePageFunc}(${currentPage - 1})" ${currentPage === 1 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''}>◀ Sebelumnya</button>`;
+            html += `<button class="btn btn-secondary" style="padding: 3px 10px;" onclick="${changePageFunc}(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''}>Berikutnya ▶</button>`;
+            html += `</div></div>`;
+            return html;
+        }
+
+        function renderBreakdownTable() {
+            const tbodyHarian = document.getElementById('table-bd-body');
+            const tbodySparepart = document.getElementById('table-sparepart-body');
+            const q = document.getElementById('search-bd').value.toLowerCase();
+            const s = document.getElementById('bd-filter-start').value;
+            const e = document.getElementById('bd-filter-end').value;
+            const mode = document.getElementById('breakdown-mode').value;
+            const selMonth = parseInt(document.getElementById('breakdown-month-select').value);
+
+            tbodyHarian.innerHTML = '';
+            tbodySparepart.innerHTML = '';
+            
+            const filtered = dbBreakdown.filter(item => {
+                const dt = getYearAndMonthFromDateStr(item.tanggal);
+                let matchYear = dt.year === currentYear;
+                let matchMonth = (mode === 'year') ? true : (dt.month === selMonth);
+                let mQ = JSON.stringify(item).toLowerCase().includes(q), mD = true;
+                if(s && e) mD = item.tanggal >= s && item.tanggal <= e; else if(s) mD = item.tanggal >= s; else if(e) mD = item.tanggal <= e;
+                return matchYear && matchMonth && mQ && mD;
+            });
+
+            const startIndex = (bdCurrentPage - 1) * rowsPerPage;
+            const paginatedData = filtered.slice(startIndex, startIndex + rowsPerPage);
+
+            paginatedData.forEach((item, idx) => {
+                let actualNo = startIndex + idx + 1;
+                let b = item.status==='Selesai'?'badge-success':item.status==='Proses'?'badge-warning':item.status==='Over Shift'?'badge-overshift':'badge-danger';
+                
+                let isLocked = isLockedAfter24Hours(item);
+                let editBtn = isLocked ? 
+                    `<button class="btn btn-secondary btn-disabled" style="padding:2px 6px;" title="Terkunci setelah 24 jam selesai">🔒</button>` : 
+                    `<button class="btn btn-warning" style="padding:2px 6px;" onclick="editBreakdown('${item.id}')">✏️</button>`;
+
+                if (breakdownSubMode === 'harian') {
+                    tbodyHarian.innerHTML += `<tr>
+                        <td>${actualNo}</td>
+                        <td>${item.tanggal}</td>
+                        <td>${item.noMesin}</td>
+                        <td>${item.namaMesin}</td>
+                        <td><strong style="color:var(--warning);">${item.kerusakan || item.item || '-'}</strong></td>
+                        <td>${item.startJam || '-'}</td>
+                        <td>${item.selesaiJam || '-'}</td>
+                        <td><strong>${item.totalJam||0}</strong></td>
+                        <td>${item.tindakan}</td>
+                        <td>${item.teknisi}</td>
+                        <td><strong style="color:var(--primary);">${item.shift||'Shift A'}</strong></td>
+                        <td><span class="badge ${b}">${item.status}</span></td>
+                        <td>${editBtn} <button class="btn btn-danger" style="padding:2px 6px;" onclick="deleteBreakdown('${item.id}')">🗑️</button></td>
+                    </tr>`;
+                } else {
+                    tbodySparepart.innerHTML += `<tr>
+                        <td>${actualNo}</td>
+                        <td>${item.tanggal}</td>
+                        <td>${item.noMesin}</td>
+                        <td>${item.namaMesin}</td>
+                        <td><strong style="color:var(--warning);">${item.sparepart || '-'}</strong></td>
+                        <td>${item.sparepartSize || '-'}</td>
+                        <td><strong>${item.sparepartQty || 0}</strong></td>
+                        <td>${item.teknisi}</td>
+                        <td><strong style="color:var(--primary);">${item.shift||'Shift A'}</strong></td>
+                        <td><span class="badge ${b}">${item.status}</span></td>
+                        <td>${editBtn} <button class="btn btn-danger" style="padding:2px 6px;" onclick="deleteBreakdown('${item.id}')">🗑️</button></td>
+                    </tr>`;
+                }
+            });
+
+            document.getElementById('pagination-bd').innerHTML = renderPaginationControls(filtered.length, bdCurrentPage, 'changeBdPage');
+        }
+
+        function changeBdPage(page) { bdCurrentPage = page; renderBreakdownTable(); }
+
+        function openBreakdownModal() {
+            document.getElementById('form-bd').reset(); document.getElementById('bd-id').value = '';
+            document.getElementById('bd-date').value = getLocalDateString();
+            document.getElementById('bd-shift').value = 'Shift A'; document.getElementById('bd-total-time').value = '0';
+            document.getElementById('bd-sparepart-qty').value = '0';
+            document.getElementById('bd-machine-mode').value = '3digit';
+            initMachineOptions('bd');
+            document.getElementById('history-box').style.display = 'none'; 
+            document.getElementById('modal-bd-title').innerText = 'Tambah Laporan Breakdown'; openModal('modal-bd');
+        }
+
+        function saveBreakdown(e) {
+            e.preventDefault();
+            const totalHours = parseFloat(document.getElementById('bd-total-time').value) || 0;
+            if (totalHours <= 0) {
+                alert("Total jam perbaikan tidak valid (0 jam). Harap periksa kembali jam start dan jam selesai.");
+                return;
+            }
+
+            const id = document.getElementById('bd-id').value || Date.now().toString();
+            let existing = dbBreakdown.find(x => x.id === id);
+            const createdAt = existing ? (existing.createdAt || Date.now()) : Date.now();
+
+            const data = {
+                id, createdAt, tanggal: document.getElementById('bd-date').value, shift: document.getElementById('bd-shift').value,
+                noMesin: document.getElementById('bd-no-mesin').value, namaMesin: document.getElementById('bd-nama-mesin').value,
+                kerusakan: document.getElementById('bd-kerusakan').value, sparepart: document.getElementById('bd-sparepart').value||'-',
+                sparepartSize: document.getElementById('bd-sparepart-size').value||'-',
+                sparepartQty: parseInt(document.getElementById('bd-sparepart-qty').value)||0,
+                startJam: document.getElementById('bd-start-time').value, selesaiJam: document.getElementById('bd-end-time').value,
+                totalJam: totalHours, tindakan: document.getElementById('bd-tindakan').value,
+                teknisi: document.getElementById('bd-teknisi').value, status: document.getElementById('bd-status').value
+            };
+            let idx = dbBreakdown.findIndex(x => x.id === id);
+            if(idx > -1) dbBreakdown[idx] = data; else dbBreakdown.push(data);
+            saveData(); closeModal('modal-bd'); renderBreakdownTable(); renderDashboard();
+        }
+
+        function editBreakdown(id) {
+            let item = dbBreakdown.find(x => x.id === id);
+            if(!item) return;
+            if(isLockedAfter24Hours(item)) { alert("Data sudah selesai dan melewati 24 jam. Edit terkunci!"); return; }
+            const proc = () => {
+                document.getElementById('bd-id').value = item.id; document.getElementById('bd-date').value = item.tanggal;
+                document.getElementById('bd-shift').value = item.shift||'Shift A'; 
+                
+                const mMode = (item.noMesin && item.noMesin.length <= 2 && parseInt(item.noMesin, 10) <= 30) ? '2digit' : '3digit';
+                document.getElementById('bd-machine-mode').value = mMode;
+                initMachineOptions('bd', item.noMesin);
+
+                document.getElementById('bd-nama-mesin').value = item.namaMesin; 
+                document.getElementById('bd-kerusakan').value = item.kerusakan || item.item || '';
+                document.getElementById('bd-sparepart').value = item.sparepart||''; 
+                document.getElementById('bd-sparepart-size').value = item.sparepartSize || '';
+                document.getElementById('bd-sparepart-qty').value = item.sparepartQty || 0;
+                document.getElementById('bd-start-time').value = item.startJam||'';
+                document.getElementById('bd-end-time').value = item.selesaiJam||''; document.getElementById('bd-total-time').value = item.totalJam||0;
+                document.getElementById('bd-tindakan').value = item.tindakan; document.getElementById('bd-teknisi').value = item.teknisi;
+                document.getElementById('bd-status').value = item.status;
+                checkMachineHistory(); document.getElementById('modal-bd-title').innerText = 'Edit Laporan Breakdown'; openModal('modal-bd');
+            };
+            if(isReportFromToday(item.tanggal)) proc(); else requireHistoryAuth(proc);
+        }
+
+        function deleteBreakdown(id) {
+            let item = dbBreakdown.find(x => x.id === id);
+            if(!item) return;
+            const act = () => { if(confirm("Hapus baris ini?")) { dbBreakdown = dbBreakdown.filter(x => x.id !== id); saveData(); renderBreakdownTable(); renderDashboard(); } };
+            if(isReportFromToday(item.tanggal)) act(); else requireHistoryAuth(act);
+        }
+
+        // --- AGENDA & PM ---
+        function toggleAgendaMode() {
+            agendaMode = document.getElementById('agenda-mode').value;
+            const btnGen = document.getElementById('btn-generate-harian');
+            const btnImportLbl = document.getElementById('btn-import-ag-label');
+            const btnExportLbl = document.getElementById('btn-export-ag-label');
+            agCurrentPage = 1;
+
+            if (agendaMode === 'harian') {
+                btnGen.style.display = 'inline-flex';
+                btnImportLbl.innerText = "📥 Impor Agenda Harian";
+                btnExportLbl.innerText = "📤 Ekspor Agenda Harian";
+                checkGenerateButtonLock();
+            } else {
+                btnGen.style.display = 'none';
+                btnImportLbl.innerText = "📥 Impor Agenda Bulanan";
+                btnExportLbl.innerText = "📤 Ekspor Agenda Bulanan";
+            }
+            renderAgendaTable();
+        }
+
+        function checkGenerateButtonLock() {
+            const btnGen = document.getElementById('btn-generate-harian');
+            if (!btnGen) return;
+
+            const todayStr = getLocalDateString();
+            const todayHarianItems = dbAgenda.filter(item => item.tanggal === todayStr && item.tipe === 'harian');
+            
+            if (todayHarianItems.length > 0) {
+                const hasUnfinished = todayHarianItems.some(item => item.status !== 'Selesai');
+                if (hasUnfinished) {
+                    btnGen.disabled = true;
+                    btnGen.style.opacity = '0.4';
+                    btnGen.style.cursor = 'not-allowed';
+                    btnGen.title = "Tombol dikunci karena agenda harian hari ini belum berstatus 'Selesai'.";
+                } else {
+                    btnGen.disabled = false;
+                    btnGen.style.opacity = '1';
+                    btnGen.style.cursor = 'pointer';
+                    btnGen.title = "Agenda harian hari ini sudah selesai, tombol dapat digunakan kembali.";
+                }
+            } else {
+                btnGen.disabled = false;
+                btnGen.style.opacity = '1';
+                btnGen.style.cursor = 'pointer';
+                btnGen.title = "Generate nomor mesin harian.";
+            }
+        }
+
+        function generateHarianAgenda() {
+            const todayStr = getLocalDateString();
+            const todayHarianItems = dbAgenda.filter(item => item.tanggal === todayStr && item.tipe === 'harian');
+            
+            if (todayHarianItems.length > 0 && todayHarianItems.some(item => item.status !== 'Selesai')) {
+                alert("Tombol terkunci! Agenda harian hari ini masih berjalan/belum berstatus 'Selesai'.");
+                return;
+            }
+
+            if (!confirm("Generate daftar agenda harian untuk No. Mesin 001 sampai 867?")) return;
+
+            dbAgenda = dbAgenda.filter(item => !(item.tanggal === todayStr && item.tipe === 'harian'));
+            const currentTime = Date.now();
+
+            for (let i = 1; i <= 876; i++) {
+                const noMesinStr = String(i).padStart(3, '0');
+                const newRecord = {
+                    id: 'harian_' + todayStr + '_' + noMesinStr + '_' + currentTime,
+                    createdAt: currentTime,
+                    tanggal: todayStr,
+                    endDate: '',
+                    shift: '',
+                    noMesin: noMesinStr,
+                    namaMesin: 'Weaving',
+                    task: '',
+                    teknisi: '',
+                    status: 'Scheduled',
+                    tipe: 'harian'
+                };
+                dbAgenda.push(newRecord);
+            }
+
+            saveData();
+            checkGenerateButtonLock();
+            agCurrentPage = 1;
+            renderAgendaTable();
+            renderDashboard();
+            alert("Berhasil men-generate 876 nomor mesin (001-867) untuk agenda harian!");
+        }
+
+        function renderAgendaTable() {
+            const tbody = document.getElementById('table-ag-body'), q = document.getElementById('search-agenda').value.toLowerCase();
+            const viewMode = document.getElementById('agenda-view-mode').value;
+            const selMonth = parseInt(document.getElementById('agenda-month-select').value);
+            tbody.innerHTML = '';
+            
+            const filteredData = dbAgenda.filter(i => {
+                const dt = getYearAndMonthFromDateStr(i.tanggal);
+                let matchYear = dt.year === currentYear;
+                let matchMonth = (viewMode === 'year') ? true : (dt.month === selMonth);
+                let matchMode = agendaMode === 'harian' ? (i.tipe === 'harian') : (i.tipe !== 'harian');
+                return matchYear && matchMonth && matchMode && JSON.stringify(i).toLowerCase().includes(q);
+            });
+
+            const startIndex = (agCurrentPage - 1) * rowsPerPage;
+            const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
+
+            paginatedData.forEach((item, idx) => {
+                let actualNo = startIndex + idx + 1;
+                let b = item.status === 'Selesai' ? 'badge-success' : item.status === 'Scheduled' ? 'badge-warning' : 'badge-danger';
+                
+                let isLocked = isLockedAfter24Hours(item);
+                let editBtn = isLocked ? 
+                    `<button class="btn btn-secondary btn-disabled" style="padding:2px 6px;" title="Terkunci setelah 24 jam selesai">🔒</button>` : 
+                    `<button class="btn btn-warning" style="padding:2px 6px;" onclick="editAgenda('${item.id}')">✏️</button>`;
+
+                let deleteBtn = (item.tipe === 'harian') ? '' : `<button class="btn btn-danger" style="padding:2px 6px;" onclick="deleteAgenda('${item.id}')">🗑️</button>`;
+
+                tbody.innerHTML += `<tr>
+                    <td>${actualNo}</td>
+                    <td>${item.tanggal}</td>
+                    <td>${item.endDate || '-'}</td>
+                    <td><strong style="color:var(--primary);">${item.noMesin}</strong></td>
+                    <td>${item.namaMesin || 'Weaving'}</td>
+                    <td>${item.task || '-'}</td>
+                    <td>${item.teknisi || '-'}</td>
+                    <td><strong>${item.shift || '-'}</strong></td>
+                    <td><span class="badge ${b}">${item.status}</span></td>
+                    <td>
+                        ${editBtn} 
+                        ${deleteBtn}
+                    </td>
+                </tr>`;
+            });
+
+            document.getElementById('pagination-ag').innerHTML = renderPaginationControls(filteredData.length, agCurrentPage, 'changeAgPage');
+
+            if (agendaMode === 'harian') {
+                checkGenerateButtonLock();
+            }
+        }
+
+        function changeAgPage(page) { agCurrentPage = page; renderAgendaTable(); }
+
+        function openAgendaModal() {
+            document.getElementById('form-ag').reset(); 
+            document.getElementById('ag-id').value = '';
+            document.getElementById('ag-tipe').value = agendaMode;
+            document.getElementById('ag-created-at').value = Date.now();
+            document.getElementById('ag-date').value = getLocalDateString();
+            document.getElementById('ag-end-date').value = '';
+            document.getElementById('ag-shift').value = ''; 
+            document.getElementById('ag-machine-mode').value = '3digit';
+            document.getElementById('ag-machine-mode').disabled = false;
+            document.getElementById('ag-date').disabled = false;
+            document.getElementById('ag-no-mesin').disabled = false;
+            
+            const namaMesinEl = document.getElementById('ag-nama-mesin');
+            namaMesinEl.value = 'Weaving';
+            namaMesinEl.disabled = true;
+
+            initMachineOptions('ag');
+            document.getElementById('modal-ag-title').innerText = agendaMode === 'harian' ? 'Tambah Agenda Harian' : 'Tambah Agenda Bulanan'; 
+            openModal('modal-ag');
+        }
+
+        function saveAgenda(e) {
+            e.preventDefault();
+            const startDate = document.getElementById('ag-date').value;
+            const endDate = document.getElementById('ag-end-date').value;
+
+            if (endDate && endDate < startDate) {
+                alert("Tanggal selesai tidak boleh lebih awal dari Tanggal Plan!");
+                return;
+            }
+
+            const id = document.getElementById('ag-id').value || Date.now().toString();
+            const tipe = document.getElementById('ag-tipe').value || agendaMode;
+            let existing = dbAgenda.find(x => x.id === id);
+            const createdAt = existing ? (existing.createdAt || Date.now()) : Date.now();
+
+            const data = {
+                id, 
+                createdAt,
+                tanggal: startDate,
+                endDate: endDate || '',
+                shift: document.getElementById('ag-shift').value,
+                noMesin: document.getElementById('ag-no-mesin').value, 
+                namaMesin: 'Weaving',
+                task: document.getElementById('ag-task').value, 
+                teknisi: document.getElementById('ag-teknisi').value, 
+                status: document.getElementById('ag-status').value,
+                tipe: tipe
+            };
+            let idx = dbAgenda.findIndex(x => x.id === id);
+            if(idx > -1) dbAgenda[idx] = data; else dbAgenda.push(data);
+            
+            saveData(); 
+            closeModal('modal-ag'); 
+            renderAgendaTable(); 
+            renderDashboard();
+        }
+
+        function editAgenda(id) {
+            let item = dbAgenda.find(x => x.id === id);
+            if(!item) return;
+            if(isLockedAfter24Hours(item)) { alert("Data sudah selesai dan melewati 24 jam. Edit terkunci!"); return; }
+            const proc = () => {
+                document.getElementById('ag-id').value = item.id; 
+                document.getElementById('ag-tipe').value = item.tipe || 'bulanan';
+                document.getElementById('ag-created-at').value = item.createdAt || Date.now();
+                document.getElementById('ag-date').value = item.tanggal;
+                document.getElementById('ag-end-date').value = item.endDate || '';
+                document.getElementById('ag-shift').value = item.shift || ''; 
+                
+                const mMode = (item.noMesin && item.noMesin.length <= 2 && parseInt(item.noMesin, 10) <= 30) ? '2digit' : '3digit';
+                document.getElementById('ag-machine-mode').value = mMode;
+                initMachineOptions('ag', item.noMesin);
+
+                const isGenerated = (item.tipe === 'harian');
+                document.getElementById('ag-date').disabled = isGenerated;
+                document.getElementById('ag-no-mesin').disabled = isGenerated;
+                document.getElementById('ag-machine-mode').disabled = isGenerated;
+
+                const namaMesinEl = document.getElementById('ag-nama-mesin');
+                namaMesinEl.value = 'Weaving';
+                namaMesinEl.disabled = true;
+
+                document.getElementById('ag-task').value = item.task || '';
+                document.getElementById('ag-teknisi').value = item.teknisi || ''; 
+                document.getElementById('ag-status').value = item.status;
+                document.getElementById('modal-ag-title').innerText = 'Edit Agenda PM'; 
+                openModal('modal-ag');
+            };
+            if(isReportFromToday(item.tanggal)) proc(); else requireHistoryAuth(proc);
+        }
+
+        function deleteAgenda(id) {
+            let item = dbAgenda.find(x => x.id === id);
+            if(!item) return;
+            if(item.tipe === 'harian') {
+                alert("Agenda harian hasil generate tidak dapat dihapus!");
+                return;
+            }
+            const act = () => { 
+                if(confirm("Hapus agenda ini?")) { 
+                    dbAgenda = dbAgenda.filter(x => x.id !== id); 
+                    saveData(); 
+                    renderAgendaTable(); 
+                    renderDashboard(); 
+                } 
+            };
+            if(isReportFromToday(item.tanggal)) act(); else requireHistoryAuth(act);
+        }
+
+        // --- MONITORING KWH ---
+        function openKwhModal() {
+            document.getElementById('form-kwh').reset(); document.getElementById('kwh-id').value = '';
+            document.getElementById('kwh-date').value = getLocalDateString();
+            document.getElementById('m-14a-export').value = "0.1";
+            document.getElementById('modal-kwh-title').innerText = "Catat Meteran kWh Harian"; openModal('modal-kwh');
+        }
+
+        function saveKwh(e) {
+            e.preventDefault();
+            const dateStr = document.getElementById('kwh-date').value, id = document.getElementById('kwh-id').value || dateStr;
+            const curM = {
+                pltsImp: parseFloat(document.getElementById('m-plts-import').value)||0,
+                a14Imp: parseFloat(document.getElementById('m-14a-import').value)||0, a14Exp: parseFloat(document.getElementById('m-14a-export').value)||0,
+                b14: parseFloat(document.getElementById('m-14b').value)||0, c14: parseFloat(document.getElementById('m-14c').value)||0,
+                mess: parseFloat(document.getElementById('m-mess').value)||0, ab3a: parseFloat(document.getElementById('m-ab3a').value)||0,
+                al2ex: parseFloat(document.getElementById('m-al2ex').value)||0, al2kwh: parseFloat(document.getElementById('m-al2kwh').value)||0,
+                ab3b: parseFloat(document.getElementById('m-ab3b').value)||0, boiler: parseFloat(document.getElementById('m-boiler').value)||0,
+                demin: parseFloat(document.getElementById('m-demin').value)||0, ro150: parseFloat(document.getElementById('m-ro150').value)||0, ro60: parseFloat(document.getElementById('m-ro60').value)||0
+            };
+            calcAndSaveKwhRecord(id, dateStr, curM);
+        }
+
+        function calcAndSaveKwhRecord(id, dateStr, curM) {
+            let record = dbKwh.find(x => x.id === id);
+            if (!record) {
+                record = { id, tanggal: dateStr, meters: curM };
+                dbKwh.push(record);
+            } else {
+                record.tanggal = dateStr;
+                record.meters = curM;
+            }
+
+            recalculateAllKwhRecords();
+            saveData(); 
+            closeModal('modal-kwh'); 
+            renderKwhTable(); 
+            renderDashboard();
+        }
+
+        function recalculateAllKwhRecords() {
+            dbKwh.sort((a,b) => a.tanggal.localeCompare(b.tanggal));
+            
+            for (let i = 0; i < dbKwh.length; i++) {
+                const rec = dbKwh[i];
+                const curM = rec.meters || {};
+                
+                let p = { pltsImp:0, a14Imp:0, a14Exp:0, b14:0, c14:0, mess:0, ab3a:0, al2ex:0, al2kwh:0, ab3b:0, boiler:0, demin:0, ro150:0, ro60:0 };
+                if (i > 0 && dbKwh[i-1].meters) {
+                    p = dbKwh[i-1].meters;
+                }
+
+                const uPltsImp = Math.max(0, curM.pltsImp - p.pltsImp);
+                const u14aImp = Math.max(0, curM.a14Imp - p.a14Imp), u14aExp = Math.max(0, curM.a14Exp - p.a14Exp);
+                const u14b = Math.max(0, curM.b14 - p.b14), u14c = Math.max(0, curM.c14 - p.c14);
+                const uMess = Math.max(0, curM.mess - p.mess), uAb3a = Math.max(0, curM.ab3a - p.ab3a)*160;
+                const uAl2ex = Math.max(0, curM.al2ex - p.al2ex), uAl2kwh = Math.max(0, curM.al2kwh - p.al2kwh)*320;
+                const uAb3b = Math.max(0, curM.ab3b - p.ab3b)*160, uBoiler = Math.max(0, curM.boiler - p.boiler);
+                const uDemin = Math.max(0, curM.demin - p.demin), uRo150 = Math.max(0, curM.ro150 - p.ro150), uRo60 = Math.max(0, curM.ro60 - p.ro60);
+
+                rec.totalSubKwh = uMess + uAb3a + uAl2ex + uAl2kwh + uAb3b + uBoiler + uDemin + uRo150 + uRo60;
+                rec.totalAj14mdp1 = u14aImp + uPltsImp;
+                rec.totalWjl14aMurni = rec.totalAj14mdp1 - rec.totalSubKwh;
+                rec.use14b = u14b;
+                rec.use14c = u14c;
+                rec.totalPemakaianWjl = rec.totalWjl14aMurni + u14b + u14c;
+                rec.kwhMurniPlts = uPltsImp;
+                rec.totalPlnWjl = Math.max(0, rec.totalPemakaianWjl - rec.kwhMurniPlts);
+            }
+        }
+
+        function renderKwhTable() {
+            const tbody = document.getElementById('table-kwh-body'), utilBody = document.getElementById('table-utility-body'), tfoot = document.getElementById('table-kwh-foot');
+            const selMonth = parseInt(document.getElementById('kwh-month-select').value);
+            tbody.innerHTML = ''; utilBody.innerHTML = ''; tfoot.innerHTML = '';
+
+            const filtered = dbKwh.filter(i => {
+                const dt = getYearAndMonthFromDateStr(i.tanggal);
+                let matchYear = dt.year === currentYear;
+                let matchMonth = dt.month === selMonth;
+                return matchYear && matchMonth;
+            }).sort((a,b)=>a.tanggal.localeCompare(b.tanggal));
+
+            const startIndex = (kwhCurrentPage - 1) * rowsPerPage;
+            const paginatedData = filtered.slice(startIndex, startIndex + rowsPerPage);
+
+            let s1=0,s2=0,s3=0,s4=0,s5=0,s6=0,s7=0,s8=0;
+
+            filtered.forEach(item => {
+                s1 += item.totalAj14mdp1||0; s2 += item.totalSubKwh||0; s3 += item.totalWjl14aMurni||0;
+                s4 += item.use14b||0; s5 += item.use14c||0; s6 += item.totalPemakaianWjl||0;
+                s7 += item.kwhMurniPlts||0; s8 += item.totalPlnWjl||0;
+            });
+
+            paginatedData.forEach(item => {
+                tbody.innerHTML += `<tr><td><strong>${item.tanggal}</strong></td><td>${(item.totalAj14mdp1||0).toFixed(1)}</td><td>${(item.totalSubKwh||0).toFixed(1)}</td><td><strong style="color:var(--primary);">${(item.totalWjl14aMurni||0).toFixed(1)}</strong></td><td>${(item.use14b||0).toFixed(1)}</td><td>${(item.use14c||0).toFixed(1)}</td><td><strong style="color:var(--warning);">${(item.totalPemakaianWjl||0).toFixed(1)}</strong></td><td>${(item.kwhMurniPlts||0).toFixed(1)}</td><td><strong style="color:var(--success);">${(item.totalPlnWjl||0).toFixed(1)}</strong></td><td><button class="btn btn-warning" style="padding:2px 6px;" onclick="editKwh('${item.id}')">✏️</button> <button class="btn btn-danger" style="padding:2px 6px;" onclick="deleteKwh('${item.id}')">🗑</button></td></tr>`;
+                
+                let m = item.meters||{};
+                utilBody.innerHTML += `<tr><td><strong>${item.tanggal}</strong></td><td>${m.pltsImp||0}</td><td>${m.a14Imp||0}</td><td>${m.a14Exp||0}</td><td>${m.mess||0}</td><td>${m.ab3a||0}</td><td>${m.al2ex||0}</td><td>${m.al2kwh||0}</td><td>${m.ab3b||0}</td><td>${m.boiler||0}</td><td>${m.demin||0}</td><td>${m.ro150||0}</td><td>${m.ro60||0}</td><td>${m.b14||0}</td><td>${m.c14||0}</td><td><button class="btn btn-warning" style="padding:2px 6px;" onclick="editKwh('${item.id}')">✏️</button> <button class="btn btn-danger" style="padding:2px 6px;" onclick="deleteKwh('${item.id}')">🗑</button></td></tr>`;
+            });
+
+            tfoot.innerHTML = `<tr><td>TOTAL BULANAN</td><td>${s1.toFixed(1)}</td><td>${s2.toFixed(1)}</td><td>${s3.toFixed(1)}</td><td>${s4.toFixed(1)}</td><td>${s5.toFixed(1)}</td><td>${s6.toFixed(1)}</td><td>${s7.toFixed(1)}</td><td>${s8.toFixed(1)}</td><td>-</td></tr>`;
+
+            document.getElementById('pagination-kwh').innerHTML = renderPaginationControls(filtered.length, kwhCurrentPage, 'changeKwhPage');
+        }
+
+        function changeKwhPage(page) { kwhCurrentPage = page; renderKwhTable(); }
+
+        function exportKwhActiveView() {
+            if (isUtilityViewActive) {
+                exportUtilityToExcel();
+            } else {
+                exportKwhToExcel();
+            }
+        }
+
+        function exportKwhToExcel() {
+            const selMonth = parseInt(document.getElementById('kwh-month-select').value);
+            const filtered = dbKwh.filter(i => {
+                const dt = getYearAndMonthFromDateStr(i.tanggal);
+                let matchYear = dt.year === currentYear;
+                let matchMonth = dt.month === selMonth;
+                return matchYear && matchMonth;
+            }).sort((a, b) => a.tanggal.localeCompare(b.tanggal));
+            
+            if (filtered.length === 0) {
+                alert("Tidak ada data kWh untuk bulan yang dipilih pada tahun ini.");
+                return;
+            }
+
+            let csv = "\uFEFFTanggal,Total AJ14MDP1 (2000 kVA),Total Sub KWH (CT),WJL 14A Murni,WJL 14B (1500 kVA),WJL 1000 kVA (14C),Total Pemakaian WJL,Murni PLTS,Total KWH PLN WJL\n";
+            let s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0, s6 = 0, s7 = 0, s8 = 0;
+
+            filtered.forEach(item => {
+                s1 += item.totalAj14mdp1 || 0; s2 += item.totalSubKwh || 0; s3 += item.totalWjl14aMurni || 0;
+                s4 += item.use14b || 0; s5 += item.use14c || 0; s6 += item.totalPemakaianWjl || 0;
+                s7 += item.kwhMurniPlts || 0; s8 += item.totalPlnWjl || 0;
+
+                csv += `${item.tanggal},${(item.totalAj14mdp1 || 0).toFixed(1)},${(item.totalSubKwh || 0).toFixed(1)},${(item.totalWjl14aMurni || 0).toFixed(1)},${(item.use14b || 0).toFixed(1)},${(item.use14c || 0).toFixed(1)},${(item.totalPemakaianWjl || 0).toFixed(1)},${(item.kwhMurniPlts || 0).toFixed(1)},${(item.totalPlnWjl || 0).toFixed(1)}\n`;
+            });
+
+            csv += `TOTAL BULANAN,${s1.toFixed(1)},${s2.toFixed(1)},${s3.toFixed(1)},${s4.toFixed(1)},${s5.toFixed(1)},${s6.toFixed(1)},${s7.toFixed(1)},${s8.toFixed(1)}\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Monitoring_KWH_Bulan_${selMonth}_${currentYear}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportUtilityToExcel() {
+            const selMonth = parseInt(document.getElementById('kwh-month-select').value);
+            const filtered = dbKwh.filter(i => {
+                const dt = getYearAndMonthFromDateStr(i.tanggal);
+                let matchYear = dt.year === currentYear;
+                let matchMonth = dt.month === selMonth;
+                return matchYear && matchMonth;
+            }).sort((a, b) => a.tanggal.localeCompare(b.tanggal));
+            
+            if (filtered.length === 0) {
+                alert("Tidak ada data utility harian untuk bulan yang dipilih pada tahun ini.");
+                return;
+            }
+
+            let csv = "\uFEFFTanggal,PLTS Imp,14A Imp,14A Exp,Mess,AB3A,AL2 EX,AL2 KWH,AB3B,Boiler,Demin,RO 150T,RO 60T,WJL 14B,WJL 14C\n";
+            filtered.forEach(item => {
+                let m = item.meters || {};
+                csv += `${item.tanggal},${m.pltsImp||0},${m.a14Imp||0},${m.a14Exp||0},${m.mess||0},${m.ab3a||0},${m.al2ex||0},${m.al2kwh||0},${m.ab3b||0},${m.boiler||0},${m.demin||0},${m.ro150||0},${m.ro60||0},${m.b14||0},${m.c14||0}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Catatan_Harian_Utility_Bulan_${selMonth}_${currentYear}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function editKwh(id) {
+            let item = dbKwh.find(x => x.id === id);
+            if(!item) return;
+            const proc = () => {
+                document.getElementById('kwh-id').value = item.id; document.getElementById('kwh-date').value = item.tanggal;
+                if(item.meters) {
+                    document.getElementById('m-plts-import').value = item.meters.pltsImp; 
+                    document.getElementById('m-14a-import').value = item.meters.a14Imp;
+                    document.getElementById('m-14a-export').value = item.meters.a14Exp;
+                    document.getElementById('m-14b').value = item.meters.b14;
+                    document.getElementById('m-14c').value = item.meters.c14;
+                    document.getElementById('m-mess').value = item.meters.mess;
+                    document.getElementById('m-ab3a').value = item.meters.ab3a;
+                    document.getElementById('m-al2ex').value = item.meters.al2ex;
+                    document.getElementById('m-al2kwh').value = item.meters.al2kwh;
+                    document.getElementById('m-ab3b').value = item.meters.ab3b;
+                    document.getElementById('m-boiler').value = item.meters.boiler;
+                    document.getElementById('m-demin').value = item.meters.demin;
+                    document.getElementById('m-ro150').value = item.meters.ro150;
+                    document.getElementById('m-ro60').value = item.meters.ro60;
+                }
+                document.getElementById('modal-kwh-title').innerText = "Edit Meteran kWh Harian"; openModal('modal-kwh');
+            };
+            if(isReportFromToday(item.tanggal)) proc(); else requireHistoryAuth(proc);
+        }
+
+        function deleteKwh(id) {
+            let item = dbKwh.find(x => x.id === id);
+            if(!item) return;
+            const act = () => { 
+                if(confirm("Hapus data tanggal ini?")) { 
+                    dbKwh = dbKwh.filter(x => x.id !== id); 
+                    recalculateAllKwhRecords();
+                    saveData(); 
+                    renderKwhTable(); 
+                    renderDashboard(); 
+                } 
+            };
+            if(isReportFromToday(item.tanggal)) act(); else requireHistoryAuth(act);
+        }
+
+        function downloadKwhTemplate() {
+            let csv = "\uFEFFTanggal,PLTS Import,14A Import,14A Export,Mess Keluarga,AB3 A,AL2 EX,AL2 KWH,AB 3B,Boiler,Demin,RO 150T,RO 60T,WJL 14B,WJL 14C\n2026-08-01,181816.0,410221.0,0.1,983522.0,31249.0,1313070.2,13699.9,40753.0,4978739.0,93859.0,1781944.0,3271225.0,44014.0,288079.0";
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Templat_Catatan_KWH_WJL.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        function importKwhExcel(e) {
+            const file = e.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const lines = evt.target.result.split(/\r\n|\n/); let cnt = 0;
+                for(let i=1; i<lines.length; i++) {
+                    if(!lines[i].trim()) continue;
+                    let c = lines[i].split(',').map(v => v.replace(/^"|"$/g, '').trim());
+                    if(c.length >= 15) {
+                        let dateStr = c[0];
+                        let curM = {
+                            pltsImp: parseFloat(c[1])||0,
+                            a14Imp: parseFloat(c[2])||0, a14Exp: parseFloat(c[3])||0,
+                            mess: parseFloat(c[4])||0, ab3a: parseFloat(c[5])||0,
+                            al2ex: parseFloat(c[6])||0, al2kwh: parseFloat(c[7])||0,
+                            ab3b: parseFloat(c[8])||0, boiler: parseFloat(c[9])||0,
+                            demin: parseFloat(c[10])||0, ro150: parseFloat(c[11])||0,
+                            ro60: parseFloat(c[12])||0, b14: parseFloat(c[13])||0, c14: parseFloat(c[14])||0
+                        };
+                        
+                        let record = dbKwh.find(x => x.id === dateStr);
+                        if (!record) {
+                            record = { id: dateStr, tanggal: dateStr, meters: curM };
+                            dbKwh.push(record);
+                        } else {
+                            record.meters = curM;
+                        }
+                        cnt++;
+                    }
+                }
+                recalculateAllKwhRecords();
+                saveData();
+                alert(`Berhasil mengimpor ${cnt} data catatan utility/kWh!`); renderKwhTable(); renderDashboard();
+            };
+            reader.readAsText(file);
+        }
+
+        function exportToExcel(type) {
+            let csv = "\uFEFF", filename = "";
+            const mode = document.getElementById('breakdown-mode').value;
+            const selMonth = parseInt(document.getElementById('breakdown-month-select').value);
+
+            if(type === 'breakdown') {
+                const filteredExportBD = dbBreakdown.filter(i => {
+                    const dt = getYearAndMonthFromDateStr(i.tanggal);
+                    let matchYear = dt.year === currentYear;
+                    let matchMonth = (mode === 'year') ? true : (dt.month === selMonth);
+                    return matchYear && matchMonth;
+                });
+
+                if (breakdownSubMode === 'sparepart') {
+                    filename = `Sparepart_Diganti_${mode === 'month' ? 'Bulan_' + selMonth + '_' : ''}${currentYear}.csv`;
+                    csv += "No,Tanggal,Shift,No Mesin,Nama Mesin,Sparepart Diganti,Ukuran,Jumlah,Teknisi,Status\n";
+                    filteredExportBD.forEach((i, idx) => {
+                        csv += `${idx+1},${i.tanggal},${i.shift||''},${i.noMesin},"${i.namaMesin}","${i.sparepart||''}","${i.sparepartSize||''}",${i.sparepartQty||0},"${i.teknisi}",${i.status}\n`;
+                    });
+                } else {
+                    filename = `Laporan_Harian_Breakdown_${mode === 'month' ? 'Bulan_' + selMonth + '_' : ''}${currentYear}.csv`;
+                    csv += "No,Tanggal,Shift,No Mesin,Nama Mesin,Kerusakan,Start,Selesai,Total Jam,Tindakan,Teknisi,Status\n";
+                    filteredExportBD.forEach((i, idx) => {
+                        csv += `${idx+1},${i.tanggal},${i.shift||''},${i.noMesin},"${i.namaMesin}","${i.kerusakan || i.item || ''}",${i.startJam||''},${i.selesaiJam||''},${i.totalJam||0},"${(i.tindakan||'').replace(/"/g,'""')}","${i.teknisi}",${i.status}\n`;
+                    });
+                }
+            } else if(type === 'agenda') {
+                const agViewMode = document.getElementById('agenda-view-mode').value;
+                const agSelMonth = parseInt(document.getElementById('agenda-month-select').value);
+                const filteredExportAg = dbAgenda.filter(i => {
+                    const dt = getYearAndMonthFromDateStr(i.tanggal);
+                    let matchYear = dt.year === currentYear;
+                    let matchMonth = (agViewMode === 'year') ? true : (dt.month === agSelMonth);
+                    let matchMode = agendaMode === 'harian' ? (i.tipe === 'harian') : (i.tipe !== 'harian');
+                    return matchYear && matchMonth && matchMode;
+                });
+
+                if (agendaMode === 'harian') {
+                    filename = `Agenda_Harian_${agViewMode === 'month' ? 'Bulan_' + agSelMonth + '_' : ''}${currentYear}.csv`;
+                    csv += "No,Tanggal Plan,Tanggal Selesai,Shift,No Mesin,Nama Mesin,Task,Teknisi,Status\n";
+                    filteredExportAg.forEach((i, idx) => {
+                        csv += `${idx+1},${i.tanggal},${i.endDate || ''},${i.shift||''},${i.noMesin},"${i.namaMesin || 'Weaving'}","${(i.task||'').replace(/"/g,'""')}","${i.teknisi || ''}",${i.status}\n`;
+                    });
+                } else {
+                    filename = `Agenda_Bulanan_${agViewMode === 'month' ? 'Bulan_' + agSelMonth + '_' : ''}${currentYear}.csv`;
+                    csv += "No,Tanggal Plan,Tanggal Selesai,Shift,No Mesin,Nama Mesin,Task,Teknisi,Status\n";
+                    filteredExportAg.forEach((i, idx) => {
+                        csv += `${idx+1},${i.tanggal},${i.endDate || ''},${i.shift||''},${i.noMesin},"${i.namaMesin || 'Weaving'}","${(i.task||'').replace(/"/g,'""')}","${i.teknisi || ''}",${i.status}\n`;
+                    });
+                }
+            }
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = filename;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        function downloadExcelTemplate(type) {
+            let csv = "\uFEFF", filename = "";
+            if(type === 'breakdown') {
+                filename = "Templat_Breakdown.csv";
+                csv += "Tanggal,Shift,No Mesin,Nama Mesin,Kerusakan,Sparepart Diganti,Ukuran Sparepart,Jumlah,Start Jam,Selesai Jam,Tindakan Perbaikan,Teknisi,Status\n2026-08-01,Shift A,001,Weaving,Inverter Error,IGBT Module,15kW,1,08:00,10:30,Ganti IGBT modul rusak,Ahmad S,Selesai";
+            } else if(type === 'agenda') {
+                filename = agendaMode === 'harian' ? "Templat_Agenda_Harian.csv" : "Templat_Agenda_Bulanan.csv";
+                csv += "Tanggal Plan,Tanggal Selesai,Shift,No Mesin,Nama Mesin,Rencana Pemeliharaan,Teknisi,Status\n2026-08-05,2026-08-06,Shift B,012,Weaving,Pembersihan inverter dan cek kabel panel,Cece S,Scheduled";
+            }
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = filename;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        function importExcel(e, type) {
+            const file = e.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const lines = evt.target.result.split(/\r\n|\n/); let cnt = 0;
+                const currentTime = Date.now();
+                for(let i=1; i<lines.length; i++) {
+                    if(!lines[i].trim()) continue;
+                    let c = lines[i].split(',').map(v => v.replace(/^"|"$/g, '').trim());
+                    if(type === 'breakdown' && c.length >= 12) {
+                        dbBreakdown.push({
+                            id: Date.now().toString() + i, createdAt: currentTime, tanggal: c[0], shift: c[1]||'Shift A', noMesin: c[2], namaMesin: c[3],
+                            kerusakan: c[4], sparepart: c[5]||'-', sparepartSize: c[6]||'-', sparepartQty: parseInt(c[7])||0,
+                            startJam: c[8]||'08:00', selesaiJam: c[9]||'09:00', totalJam: 1,
+                            tindakan: c[10], teknisi: c[11]||'Ahmad S', status: c[12]||'Selesai'
+                        });
+                        cnt++;
+                    } else if(type === 'agenda' && c.length >= 7) {
+                        dbAgenda.push({
+                            id: Date.now().toString() + i, createdAt: currentTime, tanggal: c[0], endDate: c[1]||'', shift: c[2]||'Shift A', noMesin: c[3], namaMesin: 'Weaving',
+                            task: c[5], teknisi: c[6], status: c[7]||'Scheduled', tipe: agendaMode
+                        });
+                        cnt++;
+                    }
+                }
+                saveData();
+                if(type === 'breakdown') renderBreakdownTable(); else renderAgendaTable();
+                renderDashboard(); alert(`Berhasil mengimpor ${cnt} data ${type === 'agenda' ? ('agenda ' + agendaMode) : ''} baru!`);
+            };
+            reader.readAsText(file);
+        }
+
+        function backupDatabaseJSON() {
+            const data = { version: "3.1", adminPass: currentAdminPass, settingsPass: currentSettingsPass, historyPass: currentHistoryPass, sopData: currentSopData, years: activeYears, breakdown: dbBreakdown, agenda: dbAgenda, kwh: dbKwh };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `WJL_Electrical_FullBackup_${currentYear}.json`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        function triggerRestoreFull() {
+            requireHistoryAuth(() => {
+                document.getElementById('restore-file-json').click();
+            });
+        }
+
+        function restoreDatabaseJSON(e) {
+            const file = e.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    if(parsed.breakdown && parsed.agenda) {
+                        if(confirm("Restore data akan menggantikan seluruh data saat ini. Lanjutkan?")) {
+                            dbBreakdown = parsed.breakdown; dbAgenda = parsed.agenda; dbKwh = parsed.kwh || [];
+                            if(parsed.years) activeYears = parsed.years;
+                            if(parsed.sopData) { currentSopData = parsed.sopData; localStorage.setItem('wjl_sop_data', JSON.stringify(currentSopData)); renderSopContent(); loadSopCategoryToEditor(); }
+                            if(parsed.adminPass) { currentAdminPass = parsed.adminPass; localStorage.setItem('wjl_admin_pass', currentAdminPass); }
+                            if(parsed.settingsPass) { currentSettingsPass = parsed.settingsPass; localStorage.setItem('wjl_settings_pass', currentSettingsPass); }
+                            if(parsed.historyPass) { currentHistoryPass = parsed.historyPass; localStorage.setItem('wjl_history_pass', currentHistoryPass); }
+                            recalculateAllKwhRecords();
+                            saveData(); initYearSelectors(); renderDashboard(); renderBreakdownTable(); renderAgendaTable(); renderKwhTable();
+                            alert("Database berhasil dipulihkan sepenuhnya!");
+                        }
+                    } else { alert("Format file JSON tidak valid!"); }
+                } catch(err) { alert("Gagal mem-parsing file JSON!"); }
+                e.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function backupKwhJSON() {
+            const data = { version: "kWh-Sync", kwh: dbKwh, years: activeYears };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `WJL_kWh_Sync_${currentYear}.json`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        function triggerRestoreKwh() {
+            requireHistoryAuth(() => {
+                document.getElementById('restore-file-kwh-json').click();
+            });
+        }
+
+        function restoreKwhJSON(e) {
+            const file = e.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    if(parsed.kwh) {
+                        if(confirm("Gabungkan atau timpa data kWh harian dari file produksi?")) {
+                            parsed.kwh.forEach(newItem => {
+                                let idx = dbKwh.findIndex(x => x.id === newItem.id);
+                                if(idx > -1) dbKwh[idx] = newItem; else dbKwh.push(newItem);
+                            });
+                            recalculateAllKwhRecords();
+                            saveData(); renderKwhTable(); renderDashboard();
+                            alert("Data kWh berhasil disinkronkan ke sistem pusat!");
+                        }
+                    } else { alert("Format file kWh JSON tidak valid!"); }
+                } catch(err) { alert("Gagal membaca file sinkronisasi kWh!"); }
+                e.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function requestPurgeData() {
+            const m = parseInt(document.getElementById('purge-month').value, 10);
+            const y = parseInt(document.getElementById('purge-year').value, 10);
+            requireHistoryAuth(() => {
+                if(confirm(`PERINGATAN: Hapus seluruh data pada Bulan ${m} Tahun ${y}?`)) {
+                    dbBreakdown = dbBreakdown.filter(i => { 
+                        const dt = getYearAndMonthFromDateStr(i.tanggal); 
+                        return !(dt.year === y && dt.month === m); 
+                    });
+                    dbAgenda = dbAgenda.filter(i => { 
+                        const dt = getYearAndMonthFromDateStr(i.tanggal); 
+                        return !(dt.year === y && dt.month === m); 
+                    });
+                    dbKwh = dbKwh.filter(i => { 
+                        const dt = getYearAndMonthFromDateStr(i.tanggal); 
+                        return !(dt.year === y && dt.month === m); 
+                    });
+                    recalculateAllKwhRecords();
+                    saveData(); renderDashboard(); renderBreakdownTable(); renderAgendaTable(); renderKwhTable();
+                    alert("Data periode tersebut berhasil dibersihkan dari sistem.");
+                }
+            });
+        }
+
+        function printReport(type) {
+            if (type === 'breakdown') {
+                const titleMode = breakdownSubMode === 'sparepart' ? 'SPAREPART DIGANTI' : 'LAPORAN HARIAN BREAKDOWN';
+                document.getElementById('print-sub-header').innerText = `Tahun Operasional: ${currentYear} | Jenis Laporan: ${titleMode}`;
+            } else if (type === 'agenda') {
+                const titleMode = agendaMode === 'harian' ? 'AGENDA HARIAN' : 'AGENDA BULANAN';
+                document.getElementById('print-sub-header').innerText = `Tahun Operasional: ${currentYear} | Jenis Laporan: ${titleMode}`;
+            } else {
+                document.getElementById('print-sub-header').innerText = `Tahun Operasional: ${currentYear} | Jenis Laporan: ${type.toUpperCase()}`;
+            }
+            window.print();
+        }
+
+        function printUtilityReport() {
+            document.getElementById('table-monitoring-view').classList.add('print-view-hidden');
+            document.getElementById('table-utility-view').classList.remove('print-view-hidden');
+            document.getElementById('print-sub-header').innerText = `Tahun Operasional: ${currentYear} | Rincian Lengkap Meteran Utility Harian`;
+            window.print();
+            setTimeout(() => {
+                document.getElementById('table-monitoring-view').classList.remove('print-view-hidden');
+                document.getElementById('table-utility-view').classList.add('print-view-hidden');
+            }, 1000);
+        }
+
+        function printMonitoringReport() { 
+            document.getElementById('table-monitoring-view').classList.remove('print-view-hidden');
+            document.getElementById('table-utility-view').classList.add('print-view-hidden');
+            printReport('kwh-monitoring'); 
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    </script>
+</body>
+</html>
